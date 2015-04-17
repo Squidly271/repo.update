@@ -2,7 +2,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.repositories">
 <!ENTITY author    "gfjardim/Squid">
-<!ENTITY version   "2015.04.15">
+<!ENTITY version   "2015.04.17">
 <!ENTITY launch    "Docker">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/repo.update">
@@ -12,8 +12,8 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
-###2015.04.15###
-- Changed order of repositories to alphabetical
+###2015.04.17###
+- Silence warning on malformed XML templates
 
 ###2015.04.14###
 - Fix tabbed view
