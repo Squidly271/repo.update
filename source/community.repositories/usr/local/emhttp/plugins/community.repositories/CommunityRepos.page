@@ -34,16 +34,32 @@ function toggleBeta() {
   var filter = $('#searchBox').val();
   var selectedBeta = $('#selectBeta').is(':checked');
 
+  if ( selectedBeta ) {
+    $('#helpShowBeta').prop('checked',true);
+      document.getElementById('helpSelect1').innerHTML = "Deselect";
+      document.getElementById('helpSelect2').innerHTML = "hide";
 
-  $.post(URL,{action:'get_content',filter:filter,beta:selectedBeta},function(data) {
-    if (data) $('#templates_content').html(data);
-    $('#templates_list').trigger('update');
-    $('.desc_readmore').readmore({maxHeight:50});
-    if (!filter && $('#openclose').val()=='Show') $('#templates_list .expand-child td').hide();
-  });
+    }  else {
+      $('#helpShowBeta').prop('checked',false);
+      document.getElementById('helpSelect1').innerHTML = "Select";
+      document.getElementById('helpSelect2').innerHTML = "show";
+    }
+
+    doSearch(false);
+}
 
 
+function helpToggleBeta() {
+  var filter = $('#searchBox').val();
+  var selectedBeta = $('#helpShowBeta').is(':checked');
 
+  if ( selectedBeta ) {
+    $('#selectBeta').prop('checked',true);
+    }  else {
+      $('#selectBeta').prop('checked',false);
+    }
+
+  toggleBeta();
 }
 
 
@@ -65,6 +81,16 @@ function doSearch(button) {
     $('.desc_readmore').readmore({maxHeight:50});
     if (!filter && $('#openclose').val()=='Show') $('#templates_list .expand-child td').hide();
   });
+  
+  if (filter) {
+    $('#helpRepoName').hide();
+    $('#helpShowLine').hide();
+    $('#helpCart').hide();
+  } else {
+    $('#helpRepoName').show();
+    $('#helpShowLine').show();
+    $('#helpCart').show();
+  }
 }
 function forceUpdate() {
   $('#templates_content').html("<?=$waiting?>");
@@ -104,14 +130,26 @@ function openClose(action) {
   if (action=='Show') {
     $('#templates_list .expand-child td').show();
     $('#openclose').val('Hide');
+    $('#helpShow').val('Hide');
+    document.getElementById('helpShowText').innerHTML = "to only display the first container within a repository<br>";
   } else {
     $('#templates_list .expand-child td').hide();
     $('#openclose').val('Show');
+    $('#helpShow').val('Show');
+    document.getElementById('helpShowText').innerHTML = "to display all containers within all repositories<br>";
   }
 }
 </script>
+> <span id='helpCart'>Click on <img src='/plugins/community.repositories/images/green.png' id='cartGreen' width=25> to add a repository to the repository list.  Click on 
+<img src='/plugins/community.repositories/images/red.png' id='cartRed' width=25> to remove a repository from the repository list.<br></span>
+> Click <input type=button value='Update Repositories' onclick='forceUpdate();'> to force an update of all repositories and containers<br>
+> <span id='helpRepoName'>Click on the name of the repository to show / hide all of the containers within.<br></span>
+> Click on the icon of the container to add the container (a new window will open).<br>
+> <span id='helpShowLine'>Click <input id='helpShow' type=button value='Show' onclick=openClose(this.value)><span id='helpShowText'>to display all containers within all repositories.<br></span></span>
+> <span id='helpSelect1'>Select</span> the <input id='helpShowBeta' type='checkbox' onchange='helpToggleBeta();'><strong>Show Beta</strong> check box to <span id='helpSelect2'>show</span> Beta Repositories in the main list / searches.
+> <br><br>
 <table id='templates_list' class='tablesorter <?=$shift?>'>
-<thead><tr><th style='width:220px'>Repository</th><th style='width:64px'></th><th>Docker</th><th>Author</th><th>Description</th></tr></thead>
+<thead><tr><th style='width:220px'>Repository</th><th style='width:64px'></th><th>Container</th><th>Author</th><th>Description</th></tr></thead>
 <tbody id='templates_content'><?=$waiting?></tbody>
 </table>
 <a href="#top">Back To Top</a>
