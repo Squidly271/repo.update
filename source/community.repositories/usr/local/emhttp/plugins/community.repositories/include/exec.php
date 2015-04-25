@@ -203,6 +203,10 @@ class Community {
   }
 }
 
+function highlight($text, $search) {
+  return preg_replace('#'. preg_quote($text,'#') .'#si', '<span style="background-color:#FFFF66; color:#FF0000;font-weight:bold;">\\0</span>', $search);
+}
+
 function in_docker_repos($url) {
   global $docker_repos;
   return count(preg_grep("#$url#", $docker_repos)) ? true : false;
@@ -237,6 +241,9 @@ case 'get_content':
   }
   $file = json_decode(@file_get_contents($infoFile),true);
   if (!is_array($file)) break;
+
+
+
   $ct='';
   foreach ($file as $repo) {
     $img = in_docker_repos($repo['url']) ? "src='/plugins/$plugin/images/red.png' title='Click to remove repository'" : "src='/plugins/$plugin/images/green.png' title='Click to add repository'";
@@ -247,7 +254,11 @@ case 'get_content':
     $i = 0;
     foreach ($repo['templates'] as $template) {
       if ($filter) {
-        if (preg_match("#$filter#i", $template['Name']) || preg_match("#$filter#i", $template['Author']) || preg_match("#$filter#i", $template['Description'])) $tr_td = "<tr><td style='text-align:left'>$label</td>"; else continue;
+         if (preg_match("#$filter#i", $template['Name']) || preg_match("#$filter#i", $template['Author']) || preg_match("#$filter#i", $template['Description'])) { 
+            $template['Description'] = highlight($filter, $template['Description']); $tr_td = "<tr><td style='text-align:left'>$label</td>";
+            $template['Author'] = highlight($filter, $template['Author'] );
+            $template['Name'] = highlight($filter, $template['Name'] ); 
+	} else continue;
       } else {
         $c = $i ? "" : " class='topRow'";
         $tr_td = $i++ ? "<tr class='expand-child'>" : "<tr><td${c} rowspan='_ROWS_' style='text-align:left;vertical-align:top'>$label (_ROWS_)</td>";
@@ -263,6 +274,7 @@ case 'get_content':
     $ct .= str_replace('_ROWS_',$i,$t);
   }
   echo $ct ? $ct : "<tr><td colspan='5'><br><center>No matching content found</center></td></tr>";
+
   
 break;
 
