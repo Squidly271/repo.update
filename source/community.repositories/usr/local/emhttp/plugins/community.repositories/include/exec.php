@@ -231,6 +231,11 @@ case 'toggle_repo':
 
 case 'get_content':
   $filter = isset($_POST['filter']) ? urldecode(($_POST['filter'])) : null;
+  
+ if ( urldecode($_POST['beta']) ) $beta = 'TRUE'; else $beta = 'FALSE';	
+
+
+
   $docker_repos = is_file($docker_repos) ? file($docker_repos,FILE_IGNORE_NEW_LINES) : array();
   if (!file_exists($infoFile)) {
     $Community = new Community();
@@ -246,8 +251,17 @@ case 'get_content':
 
   $ct='';
   foreach ($file as $repo) {
+	if ( urldecode($_POST['beta']) == 'false' ) {
+		if ( stripos($repo['name'],' Beta') == true ) continue;
+	}
     $img = in_docker_repos($repo['url']) ? "src='/plugins/$plugin/images/red.png' title='Click to remove repository'" : "src='/plugins/$plugin/images/green.png' title='Click to add repository'";
-    $label = "<a href='#' title='Click to show/hide dockers' class='toggle'><h3>{$repo['name']}</h3></a>";
+
+    if ( $filter ) { 
+      $label = "<a href='#' title='' class='toggle'><h3>{$repo['name']}</h3></a>";
+    } else {
+      $label = "<a href='#' title='Click to show/hide dockers' class='toggle'><h3>{$repo['name']}</h3></a>";
+    }
+
     if (!$filter) $label .= "<img $img style='width:48px;height:48px;cursor:pointer' onclick='toggleRepo(this,\"{$repo['url']}\")'>";
     $forum = isset($repo['forum']) ? $repo['forum'] : "";
     $t = "";
@@ -273,8 +287,8 @@ case 'get_content':
     }
     $ct .= str_replace('_ROWS_',$i,$t);
   }
-  echo $ct ? $ct : "<tr><td colspan='5'><br><center>No matching content found</center></td></tr>";
 
+  echo $ct ? $ct : "<tr><td colspan='5'><br><center>No matching content found</center></td></tr>";
   
 break;
 

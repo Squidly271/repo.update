@@ -18,19 +18,39 @@ var imgGreen = {src:"/plugins/<?=$plugin?>/images/green.png",title:'Click To Add
 var last = $('input[name$="tabs"]').length;
 <?if ($tabbed):?>
 <?$shift = 'shift2';?>
-$('.tabs').append("<span id='searchFilter' class='status vhshift' style='display:none'><input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' style='margin-right:2px' onclick='forceUpdate()'><input type='button' id='openclose' value='Show' onclick='openClose(this.value)'></span>");
+$('.tabs').append("<span id='searchFilter' class='status vhshift' style='display:none'><a name='top'></a><input type='checkbox' id='selectBeta' onchange='toggleBeta();'>Show Beta <input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' style='margin-right:2px' onclick='forceUpdate()'><input type='button' id='openclose' value='Show' onclick='openClose(this.value)'></span>");
 for (var x=1; x<last; x++) $('#tab'+x).bind({click:function(){$('#searchFilter').hide();}});
 $('#tab'+last).bind({click:function(){$('#searchFilter').show();}});
 <?else:?>
 <?$shift = 'shift';?>
-$('div[id=title]').last().append("<span id='searchFilter' class='status vhshift'><input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' style='margin-right:2px' onclick='forceUpdate()'><input type='button' id='openclose' value='Show' onclick='openClose(this.value)'></span>");
+$('div[id=title]').last().append("<span id='searchFilter' class='status vhshift'><a name='top'></a><input type='checkbox' id='selectBeta' onchange='toggleBeta();'>Show Beta <input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' style='margin-right:2px' onclick='forceUpdate()'><input type='button' id='openclose' value='Show' onclick='openClose(this.value)'></span>");
 <?endif;?>
 $(function(){
   getContent(true);
   $('#searchBox').keyup(function(e) {if(e.which == 13){doSearch(false);}});
 });
+
+function toggleBeta() {
+  var filter = $('#searchBox').val();
+  var selectedBeta = $('#selectBeta').is(':checked');
+
+
+  $.post(URL,{action:'get_content',filter:filter,beta:selectedBeta},function(data) {
+    if (data) $('#templates_content').html(data);
+    $('#templates_list').trigger('update');
+    $('.desc_readmore').readmore({maxHeight:50});
+    if (!filter && $('#openclose').val()=='Show') $('#templates_list .expand-child td').hide();
+  });
+
+
+
+}
+
+
 function doSearch(button) {
   var filter = $('#searchBox').val();
+  var selectedBeta = $('#selectBeta').is(':checked');
+
   if ($('#searchButton').hasClass('fa-search')) {
     if (filter) $('#searchButton').removeClass('fa-search').addClass('fa-remove');
   } else if (button) {
@@ -38,7 +58,8 @@ function doSearch(button) {
     filter = '';
     $('#searchBox').val('');
   } else if (!filter) return;
-  $.post(URL,{action:'get_content',filter:filter},function(data) {
+
+  $.post(URL,{action:'get_content',filter:filter,beta:selectedBeta},function(data) {
     if (data) $('#templates_content').html(data);
     $('#templates_list').trigger('update');
     $('.desc_readmore').readmore({maxHeight:50});
@@ -49,8 +70,11 @@ function forceUpdate() {
   $('#templates_content').html("<?=$waiting?>");
   $.post(URL,{action:'force_update'},function(){getContent(false);});
 }
+
 function getContent(init) {
-  $.post(URL,{action:'get_content'},function(data) {
+  var selectedBeta = $('#selectBeta').is(':checked');
+
+  $.post(URL,{action:'get_content',beta:selectedBeta},function(data) {
     if (data) $('#templates_content').html(data);
     if (init) $('#templates_list').tablesorter({sortList:[[0,0]],headers:{1:{sorter:false},4:{sorter:false}}}); else $('#templates_list').trigger('update');
     $('.desc_readmore').readmore({maxHeight:50});
@@ -90,3 +114,4 @@ function openClose(action) {
 <thead><tr><th style='width:220px'>Repository</th><th style='width:64px'></th><th>Docker</th><th>Author</th><th>Description</th></tr></thead>
 <tbody id='templates_content'><?=$waiting?></tbody>
 </table>
+<a href="#top">Back To Top</a>
