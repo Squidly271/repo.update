@@ -13,12 +13,12 @@ table#templates_list tbody td.topRow{border-top:1px solid <?=$line_color?>;}
 </style>
 <script>
 var URL = "/plugins/<?=$plugin?>/include/exec.php";
-var imgRed = {src:"/plugins/<?=$plugin?>/images/red.png",title:'Click To Remove Container'};
-var imgGreen = {src:"/plugins/<?=$plugin?>/images/green.png",title:'Click To Add Container'};
+var imgRed = {src:"/plugins/<?=$plugin?>/images/red.png",title:'Click to remove container'};
+var imgGreen = {src:"/plugins/<?=$plugin?>/images/green.png",title:'Click to add container'};
 var last = $('input[name$="tabs"]').length;
 <?if ($tabbed):?>
 <?$shift = 'shift2';?>
-$('.tabs').append("<span id='searchFilter' class='status vhshift' style='display:none'><input type='checkbox' id='selectBeta' onchange='toggleBeta()'>Include Beta<input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' style='margin-right:2px' onclick='forceUpdate()'><input type='button' id='openclose' value='Show' onclick='openClose(this.value)'></span>");
+$('.tabs').append("<span id='searchFilter' class='status vhshift' style='display:none'><input type='checkbox' id='selectBeta' onchange='toggleBeta(this.checked)'>Include Beta<input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' style='margin-right:2px' onclick='forceUpdate()'><input type='button' id='openclose' value='Show' onclick='openClose(this.value)'></span>");
 for (var x=1; x<last; x++) $('#tab'+x).bind({click:function(){$('#searchFilter').hide();}});
 $('#tab'+last).bind({click:function(){$('#searchFilter').show();}});
 <?else:?>
@@ -30,22 +30,21 @@ $(function(){
   $('#searchBox').keyup(function(e) {if(e.which == 13){doSearch(false);}});
 });
 
-function toggleBeta() {
+function toggleBeta(state) {
+  $('#selectBeta').prop('checked',state);
+  $('.selectHelp').prop('checked',state);   
   $('.help3').toggle();
   doSearch(false);
 }
 
 function doSearch(button) {
   var filter = $('#searchBox').val();
-
   if ($('#searchButton').hasClass('fa-search')) {
-    if (filter) $('#searchButton').removeClass('fa-search').addClass('fa-remove');
-    $('.help1').hide();
+    if (filter) { $('#searchButton').removeClass('fa-search').addClass('fa-remove'); $('.help1').hide(); }
   } else if (button) {
-    if ($('#searchButton').hasClass('fa-remove')) $('#searchButton').removeClass('fa-remove').addClass('fa-search');
+    if ($('#searchButton').hasClass('fa-remove')) { $('#searchButton').removeClass('fa-remove').addClass('fa-search'); $('.help1').show(); }
     filter = '';
     $('#searchBox').val('');
-    $('.help1').show();
   } else if (!filter) return;
   $('#BackToTop').hide();
   $.post(URL,{action:'get_content',filter:filter,beta:$('#selectBeta').is(':checked')},function(data) {
@@ -55,7 +54,6 @@ function doSearch(button) {
     if (!filter && $('#openclose').val()=='Show') $('#templates_list .expand-child td').hide();
     $('#BackToTop').show();
   });
-  if (!button) updateHelp();
 }
 
 function forceUpdate() {
@@ -110,16 +108,16 @@ function openClose(action) {
 >
 > Click <input type=button value='Update Repositories' style='margin:0 2px' onclick='forceUpdate()'> to force an update of all repositories and containers.
 >
-> <span class='help1'>Click on the name of the repository to show / hide all of the available containers within this repository.</span>
+> <span class='help1'>Click on the <strong>name</strong> of the repository to show / hide all of the available containers within this repository.</span>
 >
-> Click on the icon of the container to add the single container (a new window will open).
+> Click on the <strong>icon</strong> of the container to add the single container (a new window will open).
 >
-> <span class='help2'>Click <input type=button value='Show' style='margin:0 2px' onclick=openClose(this.value)> to display all available containers within the repositories.</span>
-> <span class='help2' style='display:none'>Click <input type=button value='Hide' style='margin:0 2px' onclick=openClose(this.value)> to to only display the first container within a repository.</span>
+> <span class='help2'>Click <input type=button value='Show' style='margin:0 2px' onclick='openClose(this.value)'> to display all available containers within the repositories.</span>
+> <span class='help2' style='display:none'>Click <input type=button value='Hide' style='margin:0 2px' onclick='openClose(this.value)'> to to only display the first container within a repository.</span>
 >
-> <span class='help3'>Select the <input type='checkbox' onchange='toggleBeta()'><strong>Include Beta</strong> check box to include Beta Repositories in the main list / searches.<br></span>
-> <span class='help3' style='display:none'>Deselect the <input type='checkbox' checked onchange='toggleBeta()'><strong>Include Beta</strong> check box to exclude Beta Repositories from the main list / searches.<br></span>
-> <br>
+> <span class='help3'>Select the <input type='checkbox' class='selectHelp' onchange='toggleBeta(this.checked)'><strong>Include Beta</strong> check box to include Beta Repositories in the main list / searches.</span>
+> <span class='help3' style='display:none'>Deselect the <input type='checkbox' class='selectHelp' checked onchange='toggleBeta(this.checked)'><strong>Include Beta</strong> check box to exclude Beta Repositories from the main list / searches.</span>
+> <br><br>
 
 <table id='templates_list' class='tablesorter <?=$shift?>'>
 <thead><tr><th style='width:220px'>Repository</th><th style='width:64px'></th><th>Container</th><th>Author</th><th>Description</th></tr></thead>
