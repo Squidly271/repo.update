@@ -32,7 +32,7 @@ $(function(){
 
 function toggleBeta(state) {
   $('#selectBeta').prop('checked',state);
-  $('.selectHelp').prop('checked',state);   
+  $('.selectBeta').prop('checked',state);   
   $('.help3').toggle();
   doSearch(false);
 }
@@ -40,9 +40,9 @@ function toggleBeta(state) {
 function doSearch(button) {
   var filter = $('#searchBox').val();
   if ($('#searchButton').hasClass('fa-search')) {
-    if (filter) { $('#searchButton').removeClass('fa-search').addClass('fa-remove'); $('.help1').hide(); }
+    if (filter) { $('#searchButton').removeClass('fa-search').addClass('fa-remove'); $('.help1').hide(); $('#openclose').attr('disabled','disabled'); $('.openclose').attr('disabled','disabled'); }
   } else if (button) {
-    if ($('#searchButton').hasClass('fa-remove')) { $('#searchButton').removeClass('fa-remove').addClass('fa-search'); $('.help1').show(); }
+    if ($('#searchButton').hasClass('fa-remove')) { $('#searchButton').removeClass('fa-remove').addClass('fa-search'); $('.help1').show(); $('#openclose').removeAttr('disabled'); $('.openclose').removeAttr('disabled'); }
     filter = '';
     $('#searchBox').val('');
   } else if (!filter) return;
@@ -106,17 +106,17 @@ function openClose(action) {
 
 > Click on <img src='/plugins/community.repositories/images/green.png' width=25> to add a repository to the list of templates or <img src='/plugins/community.repositories/images/red.png' width=25> to remove a repository from the list of templates.
 >
-> Click <input type=button value='Update Repositories' style='margin:0 2px' onclick='forceUpdate()'> to force an update of all repositories and containers.
+> Click <input type='button' value='Update Repositories' style='margin:0 2px' onclick='forceUpdate()'> to force an update of all repositories and containers.
 >
 > <span class='help1'>Click on the <strong>name</strong> of the repository to show / hide all of the available containers within this repository.</span>
 >
 > Click on the <strong>icon</strong> of the container to add the single container (a new window will open).
 >
-> <span class='help2'>Click <input type=button value='Show' style='margin:0 2px' onclick='openClose(this.value)'> to display all available containers within the repositories.</span>
-> <span class='help2' style='display:none'>Click <input type=button value='Hide' style='margin:0 2px' onclick='openClose(this.value)'> to to only display the first container within a repository.</span>
+> <span class='help2'>Click <input type='button' class='openclose' value='Show' style='margin:0 2px' onclick='openClose(this.value)'> to display all available containers within the repositories.</span>
+> <span class='help2' style='display:none'>Click <input type='button' class='openclose' value='Hide' style='margin:0 2px' onclick='openClose(this.value)'> to to only display the first container within a repository.</span>
 >
-> <span class='help3'>Select the <input type='checkbox' class='selectHelp' onchange='toggleBeta(this.checked)'><strong>Include Beta</strong> check box to include Beta Repositories in the main list / searches.</span>
-> <span class='help3' style='display:none'>Deselect the <input type='checkbox' class='selectHelp' checked onchange='toggleBeta(this.checked)'><strong>Include Beta</strong> check box to exclude Beta Repositories from the main list / searches.</span>
+> <span class='help3'>Select the <input type='checkbox' class='selectBeta' onchange='toggleBeta(this.checked)'><strong>Include Beta</strong> check box to include Beta Repositories in the main list / searches.</span>
+> <span class='help3' style='display:none'>Deselect the <input type='checkbox' class='selectBeta' checked onchange='toggleBeta(this.checked)'><strong>Include Beta</strong> check box to exclude Beta Repositories from the main list / searches.</span>
 > <br><br>
 
 <table id='templates_list' class='tablesorter <?=$shift?>'>
