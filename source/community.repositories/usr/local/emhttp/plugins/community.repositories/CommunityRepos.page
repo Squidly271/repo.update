@@ -104,7 +104,7 @@ function openClose(action) {
 }
 </script>
 
-> Click on <img src='/plugins/community.repositories/images/green.png' id='cartGreen' width=25> to add a repository to the list of templates or <img src='/plugins/community.repositories/images/red.png' id='cartRed' width=25> to remove a repository from the list of templates.
+> Click on <img src='/plugins/community.repositories/images/green.png' width=25> to add a repository to the list of templates or <img src='/plugins/community.repositories/images/red.png' width=25> to remove a repository from the list of templates.
 >
 > Click <input type=button value='Update Repositories' style='margin:0 2px' onclick='forceUpdate()'> to force an update of all repositories and containers.
 >
