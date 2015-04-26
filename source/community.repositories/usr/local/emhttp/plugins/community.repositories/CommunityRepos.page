@@ -13,98 +13,61 @@ table#templates_list tbody td.topRow{border-top:1px solid <?=$line_color?>;}
 </style>
 <script>
 var URL = "/plugins/<?=$plugin?>/include/exec.php";
-var imgRed = {src:"/plugins/<?=$plugin?>/images/red.png",title:'Click To Remove Container'};
-var imgGreen = {src:"/plugins/<?=$plugin?>/images/green.png",title:'Click To Add Container'};
+var imgRed = {src:"/plugins/<?=$plugin?>/images/red.png",title:'Click to remove container'};
+var imgGreen = {src:"/plugins/<?=$plugin?>/images/green.png",title:'Click to add container'};
 var last = $('input[name$="tabs"]').length;
 <?if ($tabbed):?>
 <?$shift = 'shift2';?>
-$('.tabs').append("<span id='searchFilter' class='status vhshift' style='display:none'><a name='top'></a><input type='checkbox' id='selectBeta' onchange='toggleBeta();'>Show Beta <input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' style='margin-right:2px' onclick='forceUpdate()'><input type='button' id='openclose' value='Show' onclick='openClose(this.value)'></span>");
+$('.tabs').append("<span id='searchFilter' class='status vhshift' style='display:none'><input type='checkbox' id='selectBeta' onchange='toggleBeta(this.checked)'>Include Beta<input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' onclick='forceUpdate()'><input type='button' id='openclose' value='Show' style='margin-left:-5px' onclick='openClose(this.value)'></span>");
 for (var x=1; x<last; x++) $('#tab'+x).bind({click:function(){$('#searchFilter').hide();}});
 $('#tab'+last).bind({click:function(){$('#searchFilter').show();}});
 <?else:?>
 <?$shift = 'shift';?>
-$('div[id=title]').last().append("<span id='searchFilter' class='status vhshift'><a name='top'></a><input type='checkbox' id='selectBeta' onchange='toggleBeta();'>Show Beta <input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' style='margin-right:2px' onclick='forceUpdate()'><input type='button' id='openclose' value='Show' onclick='openClose(this.value)'></span>");
+$('div[id=title]').last().append("<span id='searchFilter' class='status vhshift'><input type='checkbox' id='selectBeta' onchange='toggleBeta(this.checked)'>Include Beta<input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' onclick='forceUpdate()'><input type='button' id='openclose' value='Show' style='margin-left:-5px' onclick='openClose(this.value)'></span>");
 <?endif;?>
 $(function(){
   getContent(true);
   $('#searchBox').keyup(function(e) {if(e.which == 13){doSearch(false);}});
 });
 
-function toggleBeta() {
-  var filter = $('#searchBox').val();
-  var selectedBeta = $('#selectBeta').is(':checked');
-
-  if ( selectedBeta ) {
-    $('#helpShowBeta').prop('checked',true);
-      document.getElementById('helpSelect1').innerHTML = "Deselect";
-      document.getElementById('helpSelect2').innerHTML = "hide";
-
-    }  else {
-      $('#helpShowBeta').prop('checked',false);
-      document.getElementById('helpSelect1').innerHTML = "Select";
-      document.getElementById('helpSelect2').innerHTML = "show";
-    }
-
-    doSearch(false);
+function toggleBeta(state) {
+  $('#selectBeta,.selectBeta').prop('checked',state);
+  $('.help3').toggle();
+  doSearch(false);
 }
-
-
-function helpToggleBeta() {
-  var filter = $('#searchBox').val();
-  var selectedBeta = $('#helpShowBeta').is(':checked');
-
-  if ( selectedBeta ) {
-    $('#selectBeta').prop('checked',true);
-    }  else {
-      $('#selectBeta').prop('checked',false);
-    }
-
-  toggleBeta();
-}
-
 
 function doSearch(button) {
   var filter = $('#searchBox').val();
-  var selectedBeta = $('#selectBeta').is(':checked');
-
   if ($('#searchButton').hasClass('fa-search')) {
-    if (filter) $('#searchButton').removeClass('fa-search').addClass('fa-remove');
+    if (filter) { $('#searchButton').removeClass('fa-search').addClass('fa-remove'); $('.help1,#openclose').hide(); }
   } else if (button) {
-    if ($('#searchButton').hasClass('fa-remove')) $('#searchButton').removeClass('fa-remove').addClass('fa-search');
+    if ($('#searchButton').hasClass('fa-remove')) { $('#searchButton').removeClass('fa-remove').addClass('fa-search'); $('.help1,#openclose').show(); }
     filter = '';
     $('#searchBox').val('');
   } else if (!filter) return;
-
-  $.post(URL,{action:'get_content',filter:filter,beta:selectedBeta},function(data) {
+  $('#BackToTop').hide();
+  $.post(URL,{action:'get_content',filter:filter,beta:$('#selectBeta').is(':checked')},function(data) {
     if (data) $('#templates_content').html(data);
     $('#templates_list').trigger('update');
     $('.desc_readmore').readmore({maxHeight:50});
     if (!filter && $('#openclose').val()=='Show') $('#templates_list .expand-child td').hide();
+    $('#BackToTop').show();
   });
-  
-  if (filter) {
-    $('#helpRepoName').hide();
-    $('#helpShowLine').hide();
-    $('#helpCart').hide();
-  } else {
-    $('#helpRepoName').show();
-    $('#helpShowLine').show();
-    $('#helpCart').show();
-  }
 }
+
 function forceUpdate() {
   $('#templates_content').html("<?=$waiting?>");
   $.post(URL,{action:'force_update'},function(){getContent(false);});
 }
 
 function getContent(init) {
-  var selectedBeta = $('#selectBeta').is(':checked');
-
-  $.post(URL,{action:'get_content',beta:selectedBeta},function(data) {
+  $('#BackToTop').hide();
+  $.post(URL,{action:'get_content',beta:$('#selectBeta').is(':checked')},function(data) {
     if (data) $('#templates_content').html(data);
     if (init) $('#templates_list').tablesorter({sortList:[[0,0]],headers:{1:{sorter:false},4:{sorter:false}}}); else $('#templates_list').trigger('update');
     $('.desc_readmore').readmore({maxHeight:50});
     $('#templates_list .expand-child td').hide();
+    $('#BackToTop').show();
     if (init) {
       $('#templates_list').on('click','.toggle',function() {
         $(this).closest('tr').nextUntil('tr:not(.expand-child)').find('td').toggle();
@@ -113,9 +76,10 @@ function getContent(init) {
     }
   });
 }
+
 function toggleRepo(img, url) {
   $(img).load(function(){
-    $.post(URL,{action:'toggle_repo', url:url},function(data) { 
+    $.post(URL,{action:'toggle_repo', url:url},function(data) {
       if(data.status){ if(data.status == 'enabled'){
         $(img).attr('title',imgRed.title).attr('src',imgRed.src);
       } else {
@@ -126,30 +90,38 @@ function toggleRepo(img, url) {
   });
   $(img).attr('src', '/plugins/<?=$plugin;?>/images/spinner.gif');
 }
+
 function openClose(action) {
   if (action=='Show') {
     $('#templates_list .expand-child td').show();
     $('#openclose').val('Hide');
-    $('#helpShow').val('Hide');
-    document.getElementById('helpShowText').innerHTML = "to only display the first container within a repository<br>";
   } else {
     $('#templates_list .expand-child td').hide();
     $('#openclose').val('Show');
-    $('#helpShow').val('Show');
-    document.getElementById('helpShowText').innerHTML = "to display all containers within all repositories<br>";
   }
+  $('.help2').toggle();
 }
 </script>
-> <span id='helpCart'>Click on <img src='/plugins/community.repositories/images/green.png' id='cartGreen' width=25> to add a repository to the repository list.  Click on 
-<img src='/plugins/community.repositories/images/red.png' id='cartRed' width=25> to remove a repository from the repository list.<br></span>
-> Click <input type=button value='Update Repositories' onclick='forceUpdate();'> to force an update of all repositories and containers<br>
-> <span id='helpRepoName'>Click on the name of the repository to show / hide all of the containers within.<br></span>
-> Click on the icon of the container to add the container (a new window will open).<br>
-> <span id='helpShowLine'>Click <input id='helpShow' type=button value='Show' onclick=openClose(this.value)><span id='helpShowText'>to display all containers within all repositories.<br></span></span>
-> <span id='helpSelect1'>Select</span> the <input id='helpShowBeta' type='checkbox' onchange='helpToggleBeta();'><strong>Show Beta</strong> check box to <span id='helpSelect2'>show</span> Beta Repositories in the main list / searches.
+
+> <span class='help1'>Click on the <strong>name</strong> of the repository to show / hide all of the available containers within this repository.</span>
+>
+> <span class='help1'>Click on <img src='/plugins/community.repositories/images/green.png' width=25> to add a repository to the list of templates or <img src='/plugins/community.repositories/images/red.png' width=25> to remove a repository from the list of templates.</span>
+>
+> Click on the <strong>icon</strong> of the container to add the single container (a new window will open).
+>
+> Click <input type='button' value='Update Repositories' style='margin:0 2px' onclick='forceUpdate()'> to force an update of all repositories and containers.
+>
+> <span class='help1'>
+> <span class='help2'>Click <input type='button' value='Show' style='margin:0 2px' onclick='openClose(this.value)'> to display all available containers within the repositories.</span>
+> <span class='help2' style='display:none'>Click <input type='button' value='Hide' style='margin:0 2px' onclick='openClose(this.value)'> to only display the first container within a repository.</span>
+> </span>
+>
+> <span class='help3'>Select the <input type='checkbox' class='selectBeta' onchange='toggleBeta(this.checked)'><strong>Include Beta</strong> check box to include Beta Repositories in the main list / searches.</span>
+> <span class='help3' style='display:none'>Deselect the <input type='checkbox' class='selectBeta' checked onchange='toggleBeta(this.checked)'><strong>Include Beta</strong> check box to exclude Beta Repositories from the main list / searches.</span>
 > <br><br>
+
 <table id='templates_list' class='tablesorter <?=$shift?>'>
 <thead><tr><th style='width:220px'>Repository</th><th style='width:64px'></th><th>Container</th><th>Author</th><th>Description</th></tr></thead>
 <tbody id='templates_content'><?=$waiting?></tbody>
 </table>
-<a href="#top">Back To Top</a>
+<a href="#" id="BackToTop" onclick="var top=<?if ($tabbed):?>0<?else:?>$('div[id=title]').last().offset().top<?endif;?>;$('html,body').animate({scrollTop:top},'slow')">Back To Top</a>

@@ -1,6 +1,7 @@
-<?
-$plugin = "community.repositories";
+<?PHP
 require_once("/usr/local/emhttp/plugins/dynamix.docker.manager/dockerClient.php");
+
+$plugin = "community.repositories";
 $DockerTemplates = new DockerTemplates();
 $dockerManPaths['community-templates-url']  = "https://raw.githubusercontent.com/Squidly271/repo.update/master/Repositories.json";
 $dockerManPaths['templates-community']      = "/var/lib/docker/unraid/templates-community";
@@ -14,11 +15,9 @@ if (!is_link("/usr/local/emhttp/state/plugins/$plugin")) symlink($dockerManPaths
 
 class Community {
   public $verbose = false;
-
   private function debug($m) {
     if($this->verbose) echo $m.PHP_EOL;
   }
-
   private function removeDir($path){
     if (is_dir($path) === true) {
       $files = array_diff(scandir($path), array('.', '..'));
@@ -31,7 +30,6 @@ class Community {
     }
     return false;
   }
-
   public function listDir($root) {
     $iter = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($root,
@@ -44,18 +42,15 @@ class Community {
     }
     return $paths;
   }
-
   private function build_sorter($key) {
     return function ($a, $b) use ($key) {
       return strnatcmp(strtolower($a[$key]), strtolower($b[$key]));
     };
   }
-
   public function download_url($url, $path = "", $bg = false){
     exec("curl --max-time 30 --silent --insecure --location --fail ".($path ? " -o '$path' " : "")." $url ".($bg ? ">/dev/null 2>&1 &" : "2>/dev/null"), $out, $exit_code );
     return ($exit_code === 0 ) ? implode("\n", $out) : false;
   }
-
   public function downloadTemplates($Dest=NULL, $Urls=NULL){
     global $dockerManPaths;
     $Dest = ($Dest) ? $Dest : $dockerManPaths['templates-storage'];
@@ -63,17 +58,15 @@ class Community {
     $repotemplates = array();
     $output = array();
     $tmp_dir = "/tmp/tmp-".mt_rand();
-
     $urls = @file($Urls, FILE_IGNORE_NEW_LINES);
     if ( ! is_array($urls)) return false;
     $this->debug("\nURLs:\n   " . implode("\n   ", $urls));
     foreach ($urls as $url) {
       $api_regexes = array(
-        0 => '%/.*github.com/([^/]*)/([^/]*)/tree/([^/]*)/(.*)$%i',
-        1 => '%/.*github.com/([^/]*)/([^/]*)/tree/([^/]*)$%i',
-        2 => '%/.*github.com/([^/]*)/(.*).git%i',
-        3 => '%/.*github.com/([^/]*)/(.*)%i',
-        );
+      0 => '%/.*github.com/([^/]*)/([^/]*)/tree/([^/]*)/(.*)$%i',
+      1 => '%/.*github.com/([^/]*)/([^/]*)/tree/([^/]*)$%i',
+      2 => '%/.*github.com/([^/]*)/(.*).git%i',
+      3 => '%/.*github.com/([^/]*)/(.*)%i');
       for ($i=0; $i < count($api_regexes); $i++) {
         if ( preg_match($api_regexes[$i], $url, $matches) ){
           $github_api['user']   = ( isset( $matches[1] )) ? $matches[1] : "";
@@ -131,12 +124,10 @@ class Community {
     }
     return $output;
   }
-
   public function getTemplates($param) {
     global $DockerTemplates;
     return $DockerTemplates->getTemplates($param);
   }
-
   public function DownloadCommunityTemplates() {
     global $dockerManPaths, $infoFile, $DockerTemplates, $plugin;
     $output = array();
@@ -145,7 +136,6 @@ class Community {
     }
     $Repos  = json_decode($download, true);
     usort($Repos, $this->build_sorter('name'));
-
     exec("rm -rf '{$dockerManPaths['templates-community']}'");
     $downloadURL = "/tmp/tmp-".mt_rand().".url";
     file_put_contents($downloadURL, implode(PHP_EOL,array_map(function($ar){return $ar['url'];},$Repos)) );
@@ -216,7 +206,7 @@ switch ($_POST['action']) {
 case 'toggle_repo':
   $url = urldecode(($_POST['url']));
   $file = is_file($docker_repos) ? file($docker_repos,FILE_IGNORE_NEW_LINES) : array();
-  if ( in_array($url, $file) ){ 
+  if ( in_array($url, $file) ){
     $file = preg_grep("#${url}#i", $file, PREG_GREP_INVERT);
     $status = "disabled";
   } else {
@@ -230,12 +220,8 @@ case 'toggle_repo':
   break;
 
 case 'get_content':
-  $filter = isset($_POST['filter']) ? urldecode(($_POST['filter'])) : null;
-  
- if ( urldecode($_POST['beta']) ) $beta = 'TRUE'; else $beta = 'FALSE';	
-
-
-
+  $filter = isset($_POST['filter']) ? urldecode(($_POST['filter'])) : false;
+  $beta = isset($_POST['beta']) ? $_POST['beta']=='true' : false;
   $docker_repos = is_file($docker_repos) ? file($docker_repos,FILE_IGNORE_NEW_LINES) : array();
   if (!file_exists($infoFile)) {
     $Community = new Community();
@@ -247,32 +233,21 @@ case 'get_content':
   $file = json_decode(@file_get_contents($infoFile),true);
   if (!is_array($file)) break;
 
-
-
   $ct='';
   foreach ($file as $repo) {
-	if ( urldecode($_POST['beta']) == 'false' ) {
-		if ( stripos($repo['name'],' Beta') == true ) continue;
-	}
+    if (!$beta && stripos($repo['name'],' beta')) continue;
     $img = in_docker_repos($repo['url']) ? "src='/plugins/$plugin/images/red.png' title='Click to remove repository'" : "src='/plugins/$plugin/images/green.png' title='Click to add repository'";
-
-    if ( $filter ) { 
-      $label = "<a href='#' title='' class='toggle'><h3>{$repo['name']}</h3></a>";
-    } else {
-      $label = "<a href='#' title='Click to show/hide dockers' class='toggle'><h3>{$repo['name']}</h3></a>";
-    }
-
-    if (!$filter) $label .= "<img $img style='width:48px;height:48px;cursor:pointer' onclick='toggleRepo(this,\"{$repo['url']}\")'>";
+    $label = $filter ? "<h3>{$repo['name']}</h3>" : "<a href='#' title='Click to show/hide dockers' class='toggle'><h3>{$repo['name']}</h3></a><img $img style='width:48px;height:48px;cursor:pointer' onclick='toggleRepo(this,\"{$repo['url']}\")'>";
     $forum = isset($repo['forum']) ? $repo['forum'] : "";
     $t = "";
     $i = 0;
     foreach ($repo['templates'] as $template) {
       if ($filter) {
-         if (preg_match("#$filter#i", $template['Name']) || preg_match("#$filter#i", $template['Author']) || preg_match("#$filter#i", $template['Description'])) { 
+         if (preg_match("#$filter#i", $template['Name']) || preg_match("#$filter#i", $template['Author']) || preg_match("#$filter#i", $template['Description'])) {
             $template['Description'] = highlight($filter, $template['Description']); $tr_td = "<tr><td style='text-align:left'>$label</td>";
             $template['Author'] = highlight($filter, $template['Author'] );
-            $template['Name'] = highlight($filter, $template['Name'] ); 
-	} else continue;
+            $template['Name'] = highlight($filter, $template['Name'] );
+	       } else continue;
       } else {
         $c = $i ? "" : " class='topRow'";
         $tr_td = $i++ ? "<tr class='expand-child'>" : "<tr><td${c} rowspan='_ROWS_' style='text-align:left;vertical-align:top'>$label (_ROWS_)</td>";
@@ -287,10 +262,8 @@ case 'get_content':
     }
     $ct .= str_replace('_ROWS_',$i,$t);
   }
-
   echo $ct ? $ct : "<tr><td colspan='5'><br><center>No matching content found</center></td></tr>";
-  
-break;
+  break;
 
 case 'force_update':
   @unlink($infoFile);
