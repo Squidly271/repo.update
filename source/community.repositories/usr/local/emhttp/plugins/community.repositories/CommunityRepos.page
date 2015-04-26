@@ -31,8 +31,7 @@ $(function(){
 });
 
 function toggleBeta(state) {
-  $('#selectBeta').prop('checked',state);
-  $('.selectBeta').prop('checked',state);   
+  $('#selectBeta,.selectBeta').prop('checked',state);
   $('.help3').toggle();
   doSearch(false);
 }
@@ -40,9 +39,9 @@ function toggleBeta(state) {
 function doSearch(button) {
   var filter = $('#searchBox').val();
   if ($('#searchButton').hasClass('fa-search')) {
-    if (filter) { $('#searchButton').removeClass('fa-search').addClass('fa-remove'); $('.help1').hide(); $('#openclose').attr('disabled','disabled'); $('.openclose').attr('disabled','disabled'); }
+    if (filter) { $('#searchButton').removeClass('fa-search').addClass('fa-remove'); $('.help1').hide(); $('#openclose,.openclose').attr('disabled','disabled'); }
   } else if (button) {
-    if ($('#searchButton').hasClass('fa-remove')) { $('#searchButton').removeClass('fa-remove').addClass('fa-search'); $('.help1').show(); $('#openclose').removeAttr('disabled'); $('.openclose').removeAttr('disabled'); }
+    if ($('#searchButton').hasClass('fa-remove')) { $('#searchButton').removeClass('fa-remove').addClass('fa-search'); $('.help1').show(); $('#openclose,.openclose').removeAttr('disabled'); }
     filter = '';
     $('#searchBox').val('');
   } else if (!filter) return;
@@ -104,7 +103,7 @@ function openClose(action) {
 }
 </script>
 
-> Click on <img src='/plugins/community.repositories/images/green.png' width=25> to add a repository to the list of templates or <img src='/plugins/community.repositories/images/red.png' width=25> to remove a repository from the list of templates.
+> <span class='help1'>Click on <img src='/plugins/community.repositories/images/green.png' width=25> to add a repository to the list of templates or <img src='/plugins/community.repositories/images/red.png' width=25> to remove a repository from the list of templates.</span>
 >
 > Click <input type='button' value='Update Repositories' style='margin:0 2px' onclick='forceUpdate()'> to force an update of all repositories and containers.
 >
