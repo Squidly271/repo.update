@@ -23,7 +23,7 @@ for (var x=1; x<last; x++) $('#tab'+x).bind({click:function(){$('#searchFilter')
 $('#tab'+last).bind({click:function(){$('#searchFilter').show();}});
 <?else:?>
 <?$shift = 'shift';?>
-$('div[id=title]').last().append("<span id='searchFilter' class='status vhshift'><input type='checkbox' id='selectBeta' onchange='toggleBeta()'>Include Beta<input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' style='margin-right:2px' onclick='forceUpdate()'><input type='button' id='openclose' value='Show' onclick='openClose(this.value)'></span>");
+$('div[id=title]').last().append("<span id='searchFilter' class='status vhshift'><input type='checkbox' id='selectBeta' onchange='toggleBeta(this.checked)'>Include Beta<input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' style='margin-right:2px' onclick='forceUpdate()'><input type='button' id='openclose' value='Show' onclick='openClose(this.value)'></span>");
 <?endif;?>
 $(function(){
   getContent(true);
