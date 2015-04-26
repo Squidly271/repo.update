@@ -18,7 +18,7 @@ var imgGreen = {src:"/plugins/<?=$plugin?>/images/green.png",title:'Click To Add
 var last = $('input[name$="tabs"]').length;
 <?if ($tabbed):?>
 <?$shift = 'shift2';?>
-$('.tabs').append("<span id='searchFilter' class='status vhshift' style='display:none'><a name='top'></a><input type='checkbox' id='selectBeta' onchange='toggleBeta();'>Show Beta <input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' style='margin-right:2px' onclick='forceUpdate()'><input type='button' id='openclose' value='Show' onclick='openClose(this.value)'></span>");
+$('.tabs').append("<span id='searchFilter' class='status vhshift' style='display:none'><input type='checkbox' id='selectBeta' onchange='toggleBeta();'>Show Beta <input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' style='margin-right:2px' onclick='forceUpdate()'><input type='button' id='openclose' value='Show' onclick='openClose(this.value)'></span>");
 for (var x=1; x<last; x++) $('#tab'+x).bind({click:function(){$('#searchFilter').hide();}});
 $('#tab'+last).bind({click:function(){$('#searchFilter').show();}});
 <?else:?>
@@ -152,4 +152,4 @@ function openClose(action) {
 <thead><tr><th style='width:220px'>Repository</th><th style='width:64px'></th><th>Container</th><th>Author</th><th>Description</th></tr></thead>
 <tbody id='templates_content'><?=$waiting?></tbody>
 </table>
-<a href="#top">Back To Top</a>
+<a href="#" onclick="$('html,body').animate({scrollTop:0},'slow')">Back To Top</a>
