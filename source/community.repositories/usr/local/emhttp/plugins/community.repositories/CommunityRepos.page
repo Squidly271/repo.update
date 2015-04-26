@@ -113,7 +113,7 @@ function openClose(action) {
 >
 > <span class='help1'>
 > <span class='help2'>Click <input type='button' value='Show' style='margin:0 2px' onclick='openClose(this.value)'> to display all available containers within the repositories.</span>
-> <span class='help2' style='display:none'>Click <input type='button' value='Hide' style='margin:0 2px' onclick='openClose(this.value)'> to to only display the first container within a repository.</span>
+> <span class='help2' style='display:none'>Click <input type='button' value='Hide' style='margin:0 2px' onclick='openClose(this.value)'> to only display the first container within a repository.</span>
 > </span>
 >
 > <span class='help3'>Select the <input type='checkbox' class='selectBeta' onchange='toggleBeta(this.checked)'><strong>Include Beta</strong> check box to include Beta Repositories in the main list / searches.</span>
