@@ -103,13 +103,13 @@ function openClose(action) {
 }
 </script>
 
-> <span class='help1'>Click on <img src='/plugins/community.repositories/images/green.png' width=25> to add a repository to the list of templates or <img src='/plugins/community.repositories/images/red.png' width=25> to remove a repository from the list of templates.</span>
->
-> Click <input type='button' value='Update Repositories' style='margin:0 2px' onclick='forceUpdate()'> to force an update of all repositories and containers.
->
 > <span class='help1'>Click on the <strong>name</strong> of the repository to show / hide all of the available containers within this repository.</span>
 >
+> <span class='help1'>Click on <img src='/plugins/community.repositories/images/green.png' width=25> to add a repository to the list of templates or <img src='/plugins/community.repositories/images/red.png' width=25> to remove a repository from the list of templates.</span>
+>
 > Click on the <strong>icon</strong> of the container to add the single container (a new window will open).
+>
+> Click <input type='button' value='Update Repositories' style='margin:0 2px' onclick='forceUpdate()'> to force an update of all repositories and containers.
 >
 > <span class='help1'>
 > <span class='help2'>Click <input type='button' value='Show' style='margin:0 2px' onclick='openClose(this.value)'> to display all available containers within the repositories.</span>
