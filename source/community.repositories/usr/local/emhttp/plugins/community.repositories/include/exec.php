@@ -237,12 +237,7 @@ case 'get_content':
   foreach ($file as $repo) {
     if (!$beta && stripos($repo['name'],' beta')) continue;
     $img = in_docker_repos($repo['url']) ? "src='/plugins/$plugin/images/red.png' title='Click to remove repository'" : "src='/plugins/$plugin/images/green.png' title='Click to add repository'";
-    if ($filter) {
-      $label = "<a href='#' class='toggle'><h3>{$repo['name']}</h3></a>";
-    } else {
-      $label = "<a href='#' title='Click to show/hide dockers' class='toggle'><h3>{$repo['name']}</h3></a>";
-    }
-    if (!$filter) $label .= "<img $img style='width:48px;height:48px;cursor:pointer' onclick='toggleRepo(this,\"{$repo['url']}\")'>";
+    $label = $filter ? "<h3>{$repo['name']}</h3>" : "<a href='#' title='Click to show/hide dockers' class='toggle'><h3>{$repo['name']}</h3></a><img $img style='width:48px;height:48px;cursor:pointer' onclick='toggleRepo(this,\"{$repo['url']}\")'>";
     $forum = isset($repo['forum']) ? $repo['forum'] : "";
     $t = "";
     $i = 0;
