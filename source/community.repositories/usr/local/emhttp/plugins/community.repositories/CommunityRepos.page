@@ -18,12 +18,12 @@ var imgGreen = {src:"/plugins/<?=$plugin?>/images/green.png",title:'Click to add
 var last = $('input[name$="tabs"]').length;
 <?if ($tabbed):?>
 <?$shift = 'shift2';?>
-$('.tabs').append("<span id='searchFilter' class='status vhshift' style='display:none'><input type='checkbox' id='selectBeta' onchange='toggleBeta(this.checked)'>Include Beta<input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' style='margin-right:2px' onclick='forceUpdate()'><input type='button' id='openclose' value='Show' onclick='openClose(this.value)'></span>");
+$('.tabs').append("<span id='searchFilter' class='status vhshift' style='display:none'><input type='checkbox' id='selectBeta' onchange='toggleBeta(this.checked)'>Include Beta<input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' onclick='forceUpdate()'><input type='button' id='openclose' value='Show' style='margin-left:-5px' onclick='openClose(this.value)'></span>");
 for (var x=1; x<last; x++) $('#tab'+x).bind({click:function(){$('#searchFilter').hide();}});
 $('#tab'+last).bind({click:function(){$('#searchFilter').show();}});
 <?else:?>
 <?$shift = 'shift';?>
-$('div[id=title]').last().append("<span id='searchFilter' class='status vhshift'><input type='checkbox' id='selectBeta' onchange='toggleBeta(this.checked)'>Include Beta<input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' style='margin-right:2px' onclick='forceUpdate()'><input type='button' id='openclose' value='Show' onclick='openClose(this.value)'></span>");
+$('div[id=title]').last().append("<span id='searchFilter' class='status vhshift'><input type='checkbox' id='selectBeta' onchange='toggleBeta(this.checked)'>Include Beta<input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' onclick='forceUpdate()'><input type='button' id='openclose' value='Show' style='margin-left:-5px' onclick='openClose(this.value)'></span>");
 <?endif;?>
 $(function(){
   getContent(true);
@@ -39,9 +39,9 @@ function toggleBeta(state) {
 function doSearch(button) {
   var filter = $('#searchBox').val();
   if ($('#searchButton').hasClass('fa-search')) {
-    if (filter) { $('#searchButton').removeClass('fa-search').addClass('fa-remove'); $('.help1').hide(); $('#openclose,.openclose').attr('disabled','disabled'); }
+    if (filter) { $('#searchButton').removeClass('fa-search').addClass('fa-remove'); $('.help1,#openclose').hide(); }
   } else if (button) {
-    if ($('#searchButton').hasClass('fa-remove')) { $('#searchButton').removeClass('fa-remove').addClass('fa-search'); $('.help1').show(); $('#openclose,.openclose').removeAttr('disabled'); }
+    if ($('#searchButton').hasClass('fa-remove')) { $('#searchButton').removeClass('fa-remove').addClass('fa-search'); $('.help1,#openclose').show(); }
     filter = '';
     $('#searchBox').val('');
   } else if (!filter) return;
@@ -111,8 +111,10 @@ function openClose(action) {
 >
 > Click on the <strong>icon</strong> of the container to add the single container (a new window will open).
 >
-> <span class='help2'>Click <input type='button' class='openclose' value='Show' style='margin:0 2px' onclick='openClose(this.value)'> to display all available containers within the repositories.</span>
-> <span class='help2' style='display:none'>Click <input type='button' class='openclose' value='Hide' style='margin:0 2px' onclick='openClose(this.value)'> to to only display the first container within a repository.</span>
+> <span class='help1'>
+> <span class='help2'>Click <input type='button' value='Show' style='margin:0 2px' onclick='openClose(this.value)'> to display all available containers within the repositories.</span>
+> <span class='help2' style='display:none'>Click <input type='button' value='Hide' style='margin:0 2px' onclick='openClose(this.value)'> to to only display the first container within a repository.</span>
+> </span>
 >
 > <span class='help3'>Select the <input type='checkbox' class='selectBeta' onchange='toggleBeta(this.checked)'><strong>Include Beta</strong> check box to include Beta Repositories in the main list / searches.</span>
 > <span class='help3' style='display:none'>Deselect the <input type='checkbox' class='selectBeta' checked onchange='toggleBeta(this.checked)'><strong>Include Beta</strong> check box to exclude Beta Repositories from the main list / searches.</span>
