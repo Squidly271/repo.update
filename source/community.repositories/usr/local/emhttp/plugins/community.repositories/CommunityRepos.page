@@ -123,4 +123,4 @@ function openClose(action) {
 <thead><tr><th style='width:220px'>Repository</th><th style='width:64px'></th><th>Container</th><th>Author</th><th>Description</th></tr></thead>
 <tbody id='templates_content'><?=$waiting?></tbody>
 </table>
-<a href="#" id="BackToTop" onclick="$('html,body').animate({scrollTop:0},'slow')">Back To Top</a>
+<a href="#" id="BackToTop" onclick="var top=<?if ($tabbed):?>0<?else:?>$('div[id=title]').last().offset().top<?endif;?>;$('html,body').animate({scrollTop:top},'slow')">Back To Top</a>
