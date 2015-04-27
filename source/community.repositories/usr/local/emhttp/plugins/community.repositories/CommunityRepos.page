@@ -99,6 +99,7 @@ function openClose(action) {
     $('#templates_list .expand-child td').hide();
     $('#openclose').val('Show');
   }
+  $('.desc_readmore').readmore({maxHeight:50});
   $('.help2').toggle();
 }
 </script>
