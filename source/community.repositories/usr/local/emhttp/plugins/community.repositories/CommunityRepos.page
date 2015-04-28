@@ -16,16 +16,16 @@ var URL = "/plugins/<?=$plugin?>/include/exec.php";
 var imgRed = {src:"/plugins/<?=$plugin?>/images/red.png",title:'Click to remove container'};
 var imgGreen = {src:"/plugins/<?=$plugin?>/images/green.png",title:'Click to add container'};
 var last = $('input[name$="tabs"]').length;
+$(function(){
 <?if ($tabbed):?>
 <?$shift = 'shift2';?>
-$('.tabs').append("<span id='searchFilter' class='status vhshift' style='display:none'><input type='checkbox' id='selectBeta' onchange='toggleBeta(this.checked)'>Include Beta<input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' onclick='forceUpdate()'><input type='button' id='openclose' value='Show' style='margin-left:-5px' onclick='openClose(this.value)'></span>");
-for (var x=1; x<last; x++) $('#tab'+x).bind({click:function(){$('#searchFilter').hide();}});
-$('#tab'+last).bind({click:function(){$('#searchFilter').show();}});
+  $('.tabs').append("<span id='searchFilter' class='status vhshift' style='display:none'><input type='checkbox' id='selectBeta' onchange='toggleBeta(this.checked)'>Include Beta<input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' onclick='forceUpdate()'><input type='button' id='openclose' value='Show' style='margin-left:-5px' onclick='openClose(this.value)'></span>");
+  for (var x=1; x<last; x++) $('#tab'+x).bind({click:function(){$('#searchFilter').hide();}});
+  $('#tab'+last).bind({click:function(){$('#searchFilter').show();$('.desc_readmore').readmore({maxHeight:50});}});
 <?else:?>
 <?$shift = 'shift';?>
-$('div[id=title]').last().append("<span id='searchFilter' class='status vhshift'><input type='checkbox' id='selectBeta' onchange='toggleBeta(this.checked)'>Include Beta<input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' onclick='forceUpdate()'><input type='button' id='openclose' value='Show' style='margin-left:-5px' onclick='openClose(this.value)'></span>");
+  $('div[id=title]').last().append("<span id='searchFilter' class='status vhshift'><input type='checkbox' id='selectBeta' onchange='toggleBeta(this.checked)'>Include Beta<input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' onclick='forceUpdate()'><input type='button' id='openclose' value='Show' style='margin-left:-5px' onclick='openClose(this.value)'></span>");
 <?endif;?>
-$(function(){
   getContent(true);
   $('#searchBox').keyup(function(e) {if(e.which == 13){doSearch(false);}});
 });
@@ -99,6 +99,7 @@ function openClose(action) {
     $('#templates_list .expand-child td').hide();
     $('#openclose').val('Show');
   }
+  $('.desc_readmore').readmore({maxHeight:50});
   $('.help2').toggle();
 }
 </script>
