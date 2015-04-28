@@ -1,8 +1,8 @@
 <?xml version='1.0' standalone='yes'?>
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.repositories">
-<!ENTITY author    "gfjardim/bonienl/Squid">
-<!ENTITY version   "2015.04.26a">
+<!ENTITY author    "gfjardim/bergware/Squid">
+<!ENTITY version   "2015.04.27">
 <!ENTITY launch    "Docker">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/repo.update">
@@ -12,6 +12,9 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2015.04.27###
+- Readmore fix
+
 ###2015.04.26a###
 - Coding improvements
 
