@@ -8,6 +8,7 @@ $dockerManPaths['templates-community']      = "/var/lib/docker/unraid/templates-
 $dockerManPaths['community-templates-info'] = "/var/lib/docker/unraid/templates-community/templates.json";
 $infoFile                                   = $dockerManPaths['community-templates-info'];
 $docker_repos                               = $dockerManPaths['template-repos'];
+$dockerManPaths['special-repos']            = "/boot/config/plugins/community.repositories/private.repositories.json";
 
 # Make sure the link is in place
 if (is_dir("/usr/local/emhttp/state/plugins/$plugin")) exec("rm -rf /usr/local/emhttp/state/plugins/$plugin");
@@ -135,6 +136,11 @@ class Community {
       return false;
     }
     $Repos  = json_decode($download, true);
+
+    if (file_exists($dockerManPaths['special-repos'])) {
+      $Repos  = array_merge($Repos,json_decode(file_get_contents($dockerManPaths['special-repos']),true));
+    }
+
     usort($Repos, $this->build_sorter('name'));
     exec("rm -rf '{$dockerManPaths['templates-community']}'");
     $downloadURL = "/tmp/tmp-".mt_rand().".url";

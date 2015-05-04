@@ -2,7 +2,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.repositories">
 <!ENTITY author    "gfjardim/bergware/Squid">
-<!ENTITY version   "2015.04.27">
+<!ENTITY version   "2015.05.03">
 <!ENTITY launch    "Docker">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/repo.update">
@@ -12,6 +12,9 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2015.05.03###
+- Added in beta support for private repositories
+
 ###2015.04.27###
 - Readmore fix
 
@@ -102,7 +105,7 @@ The 'remove' script.
 <INLINE>
 removepkg &name;-&version;
 rm -rf &plugdir;
-rm -rf /boot/config/plugins/&name;
+# rm -rf /boot/config/plugins/&name;
 rm -rf /var/lib/docker/unraid/templates-community
 </INLINE>
 </FILE> 
