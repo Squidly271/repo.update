@@ -4,7 +4,7 @@ Cond="(pgrep('docker')!==false)"
 ---
 <?
 $plugin = "community.repositories";
-$waiting = "<tr><td colspan='5'><br><center><img src='/webGui/images/spinner.gif'>&nbsp;<em>Please wait... retrieving repositories information!</em></center></td></tr>";
+$waiting = "<tr><td colspan='5'><br><center><i class='fa fa-spinner fa-spin'></i>&nbsp;<em>Please wait... retrieving repositories information!</em></center></td></tr>";
 $line_color = $display['theme']=='black' ? '#202020' : '#E8E8E8';
 ?>
 <style>
@@ -48,7 +48,7 @@ function doSearch(button) {
   $('#BackToTop').hide();
   $.post(URL,{action:'get_content',filter:filter,beta:$('#selectBeta').is(':checked')},function(data) {
     if (data) $('#templates_content').html(data);
-    $('#templates_list').trigger('update');
+    $('#templates_list').trigger('update',true);
     $('.desc_readmore').readmore({maxHeight:50});
     if (!filter && $('#openclose').val()=='Show') $('#templates_list .expand-child td').hide();
     $('#BackToTop').show();
@@ -57,6 +57,7 @@ function doSearch(button) {
 
 function forceUpdate() {
   $('#templates_content').html("<?=$waiting?>");
+  if ($('#searchButton').hasClass('fa-remove')) { $('#searchButton').removeClass('fa-remove').addClass('fa-search'); $('#searchBox').val(''); }
   $.post(URL,{action:'force_update'},function(){getContent(false);});
 }
 
@@ -64,9 +65,13 @@ function getContent(init) {
   $('#BackToTop').hide();
   $.post(URL,{action:'get_content',beta:$('#selectBeta').is(':checked')},function(data) {
     if (data) $('#templates_content').html(data);
-    if (init) $('#templates_list').tablesorter({sortList:[[0,0]],headers:{1:{sorter:false},4:{sorter:false}}}); else $('#templates_list').trigger('update');
+    if (init) {
+      $('#templates_list').tablesorter({sortList:[[0,0]],headers:{1:{sorter:false},4:{sorter:false}}});
+    } else {
+      $('#templates_list').trigger('update',true);
+    }
     $('.desc_readmore').readmore({maxHeight:50});
-    $('#templates_list .expand-child td').hide();
+    if ($('#openclose').val()=='Show') $('#templates_list .expand-child td').hide();
     $('#BackToTop').show();
     if (init) {
       $('#templates_list').on('click','.toggle',function() {
