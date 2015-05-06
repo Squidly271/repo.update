@@ -9,6 +9,7 @@ $dockerManPaths['community-templates-info'] = "/var/lib/docker/unraid/templates-
 $infoFile                                   = $dockerManPaths['community-templates-info'];
 $docker_repos                               = $dockerManPaths['template-repos'];
 $dockerManPaths['special-repos']            = "/boot/config/plugins/community.repositories/private.repositories.json";
+$info                                       = $DockerTemplates->getAllInfo();
 
 # Make sure the link is in place
 if (is_dir("/usr/local/emhttp/state/plugins/$plugin")) exec("rm -rf /usr/local/emhttp/state/plugins/$plugin");
@@ -136,11 +137,9 @@ class Community {
       return false;
     }
     $Repos  = json_decode($download, true);
-
     if (file_exists($dockerManPaths['special-repos'])) {
-      $Repos  = array_merge($Repos,json_decode(file_get_contents($dockerManPaths['special-repos']),true));
+      $Repos = array_merge($Repos,json_decode(file_get_contents($dockerManPaths['special-repos']),true));
     }
-
     usort($Repos, $this->build_sorter('name'));
     exec("rm -rf '{$dockerManPaths['templates-community']}'");
     $downloadURL = "/tmp/tmp-".mt_rand().".url";
@@ -248,19 +247,23 @@ case 'get_content':
     $t = "";
     $i = 0;
     foreach ($repo['templates'] as $template) {
+      $name = $template['Name'];
       if ($filter) {
          if (preg_match("#$filter#i", $template['Name']) || preg_match("#$filter#i", $template['Author']) || preg_match("#$filter#i", $template['Description'])) {
             $template['Description'] = highlight($filter, $template['Description']); $tr_td = "<tr><td style='text-align:left'>$label</td>";
-            $template['Author'] = highlight($filter, $template['Author'] );
-            $template['Name'] = highlight($filter, $template['Name'] );
+            $template['Author'] = highlight($filter, $template['Author']);
+            $template['Name'] = highlight($filter, $name);
 	       } else continue;
       } else {
         $c = $i ? "" : " class='topRow'";
         $tr_td = $i++ ? "<tr class='expand-child'>" : "<tr><td${c} rowspan='_ROWS_' style='text-align:left;vertical-align:top'>$label (_ROWS_)</td>";
       }
-      $t .= sprintf("$tr_td<td${c} style='text-align:center;margin:0;padding:0'><a href='/Docker/AddContainer?xmlTemplate=default:%s' title='Click to add container' target='_blank'><img src='%s' style='width:48px;height:48px;'></a></td><td${c}>%s%s</td><td${c}>%s</td><td${c}><span class='desc_readmore' style='display:block'>%s</span></td></tr>",
-            $template['Path'],
+      $selected = $info[$name]['template'] && stripos($info[$name]['icon'], $template['Author']) !== false;
+      $t .= sprintf("$tr_td<td${c} style='text-align:center;margin:0;padding:0'><a href='/Docker/%s' title='Click to %s container'><div style='position: relative; width: 48px; height: 48px; margin: 0px auto'><img src='%s' style='position:absolute;z-index:1;opacity:1.0;top:0;bottom:0;left:0;right:0;width:48px;height:48px;'>%s</a></div></td><td${c}>%s%s</td><td${c}>%s</td><td${c}><span class='desc_readmore' style='display:block'>%s</span></td></tr>",
+           ($selected ? "UpdateContainer?xmlTemplate=edit:".addslashes($info[$name]['template']) : "AddContainer?xmlTemplate=default:".addslashes($template['Path'])),
+           ($selected ? "edit" : "add"),
            ($template['Icon'] ? $template['Icon'] : "/plugins/$plugin/images/question.png"),
+           ($selected ? "<i class='fa iconstatus fa-wrench'></i>" : ""),
             $template['Name'],
            ($template['Support'] ? "<div><a href='".$template['Support']."' target='_blank'>[Support]</a></div>" : ""),
             $template['Author'],

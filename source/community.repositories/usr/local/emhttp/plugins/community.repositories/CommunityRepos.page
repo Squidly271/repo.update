@@ -21,7 +21,7 @@ $(function(){
 <?$shift = 'shift2';?>
   $('.tabs').append("<span id='searchFilter' class='status vhshift' style='display:none'><input type='checkbox' id='selectBeta' onchange='toggleBeta(this.checked)'>Include Beta<input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' onclick='forceUpdate()'><input type='button' id='openclose' value='Show' style='margin-left:-5px' onclick='openClose(this.value)'></span>");
   for (var x=1; x<last; x++) $('#tab'+x).bind({click:function(){$('#searchFilter').hide();}});
-  $('#tab'+last).bind({click:function(){$('#searchFilter').show();$('.desc_readmore').readmore({maxHeight:50});}});
+  $('#tab'+last).bind({click:function(){$('#searchFilter').show();readMore();}});
 <?else:?>
 <?$shift = 'shift';?>
   $('div[id=title]').last().append("<span id='searchFilter' class='status vhshift'><input type='checkbox' id='selectBeta' onchange='toggleBeta(this.checked)'>Include Beta<input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' onclick='forceUpdate()'><input type='button' id='openclose' value='Show' style='margin-left:-5px' onclick='openClose(this.value)'></span>");
@@ -29,6 +29,10 @@ $(function(){
   getContent(true);
   $('#searchBox').keyup(function(e) {if(e.which == 13){doSearch(false);}});
 });
+
+function readMore() {
+  $('.desc_readmore').readmore({maxHeight:50});
+}
 
 function toggleBeta(state) {
   $('#selectBeta,.selectBeta').prop('checked',state);
@@ -39,9 +43,9 @@ function toggleBeta(state) {
 function doSearch(button) {
   var filter = $('#searchBox').val();
   if ($('#searchButton').hasClass('fa-search')) {
-    if (filter) { $('#searchButton').removeClass('fa-search').addClass('fa-remove'); $('.help1,#openclose').hide(); }
+    if (filter) { $('#searchButton').toggleClass('fa-search fa-remove'); $('.help1,#openclose').hide(); }
   } else if (button) {
-    if ($('#searchButton').hasClass('fa-remove')) { $('#searchButton').removeClass('fa-remove').addClass('fa-search'); $('.help1,#openclose').show(); }
+    if ($('#searchButton').hasClass('fa-remove')) { $('#searchButton').toggleClass('fa-remove fa-search'); $('.help1,#openclose').show(); }
     filter = '';
     $('#searchBox').val('');
   } else if (!filter) return;
@@ -49,7 +53,7 @@ function doSearch(button) {
   $.post(URL,{action:'get_content',filter:filter,beta:$('#selectBeta').is(':checked')},function(data) {
     if (data) $('#templates_content').html(data);
     $('#templates_list').trigger('update',true);
-    $('.desc_readmore').readmore({maxHeight:50});
+    readMore();
     if (!filter && $('#openclose').val()=='Show') $('#templates_list .expand-child td').hide();
     $('#BackToTop').show();
   });
@@ -57,7 +61,7 @@ function doSearch(button) {
 
 function forceUpdate() {
   $('#templates_content').html("<?=$waiting?>");
-  if ($('#searchButton').hasClass('fa-remove')) { $('#searchButton').removeClass('fa-remove').addClass('fa-search'); $('#searchBox').val(''); }
+  if ($('#searchButton').hasClass('fa-remove')) { $('#searchButton').toggleClass('fa-remove fa-search'); $('#searchBox').val(''); $('.help1,#openclose').show(); }
   $.post(URL,{action:'force_update'},function(){getContent(false);});
 }
 
@@ -70,7 +74,7 @@ function getContent(init) {
     } else {
       $('#templates_list').trigger('update',true);
     }
-    $('.desc_readmore').readmore({maxHeight:50});
+    readMore();
     if ($('#openclose').val()=='Show') $('#templates_list .expand-child td').hide();
     $('#BackToTop').show();
     if (init) {
@@ -104,7 +108,7 @@ function openClose(action) {
     $('#templates_list .expand-child td').hide();
     $('#openclose').val('Show');
   }
-  $('.desc_readmore').readmore({maxHeight:50});
+  readMore();
   $('.help2').toggle();
 }
 </script>
