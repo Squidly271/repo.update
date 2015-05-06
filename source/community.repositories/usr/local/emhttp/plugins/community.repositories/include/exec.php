@@ -237,6 +237,10 @@ case 'get_content':
     }
   }
   $file = json_decode(@file_get_contents($infoFile),true);
+
+  $runningDockers=str_replace('/','',shell_exec('docker ps'));
+  $imagesDocker=str_replace('/','',shell_exec('docker images'));
+
   if (!is_array($file)) break;
 
   $ct='';
@@ -258,11 +262,22 @@ case 'get_content':
         $c = $i ? "" : " class='topRow'";
         $tr_td = $i++ ? "<tr class='expand-child'>" : "<tr><td${c} rowspan='_ROWS_' style='text-align:left;vertical-align:top'>$label (_ROWS_)</td>";
       }
-      $t .= sprintf("$tr_td<td${c} style='text-align:center;margin:0;padding:0'><a href='/Docker/AddContainer?xmlTemplate=default:%s' title='Click to add container' target='_blank'><img src='%s' style='width:48px;height:48px;'></a></td><td${c}>%s%s</td><td${c}>%s</td><td${c}><span class='desc_readmore' style='display:block'>%s</span></td></tr>",
+
+      $dockerRepo="/".str_replace('/','',$template['Repository'])."/i";
+
+      if ( preg_match($dockerRepo, $imagesDocker) ) {
+        $dockerRunning = preg_match($dockerRepo, $runningDockers) ? "<img src='/plugins/$plugin/images/running.png' style='width:30px' title='Currently Running'><a hidden>running</a>"
+          : "<img src='/plugins/$plugin/images/download.png' style='width:30px' title='Installed / Not Running' href='/plugins/dockerMan'><a hidden>downloaded</a>";
+      } else {
+        $dockerRunning = "";
+      }
+
+      $t .= sprintf("$tr_td<td${c} style='text-align:center;margin:0;padding:0'><a href='/Docker/AddContainer?xmlTemplate=default:%s' title='Click to add container' target='_self'><img src='%s' style='width:48px;height:48px;'></a></td><td${c}>%s%s</td><td>%s</td><td${c}>%s</td><td${c}><span class='desc_readmore' style='display:block'>%s</span></td></tr>",
             $template['Path'],
            ($template['Icon'] ? $template['Icon'] : "/plugins/$plugin/images/question.png"),
             $template['Name'],
            ($template['Support'] ? "<div><a href='".$template['Support']."' target='_blank'>[Support]</a></div>" : ""),
+            $dockerRunning,
             $template['Author'],
             $template['Description']);
     }

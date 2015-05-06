@@ -127,7 +127,7 @@ function openClose(action) {
 > <br><br>
 
 <table id='templates_list' class='tablesorter <?=$shift?>'>
-<thead><tr><th style='width:220px'>Repository</th><th style='width:64px'></th><th>Container</th><th>Author</th><th>Description</th></tr></thead>
+<thead><tr><th style='width:220px'>Repository</th><th style='width:64px'></th><th>Container</th><th>Status</th><th>Author</th><th>Description</th></tr></thead>
 <tbody id='templates_content'><?=$waiting?></tbody>
 </table>
 <a href="#" id="BackToTop" onclick="var top=<?if ($tabbed):?>0<?else:?>$('div[id=title]').last().offset().top<?endif;?>;$('html,body').animate({scrollTop:top},'slow')">Back To Top</a>
