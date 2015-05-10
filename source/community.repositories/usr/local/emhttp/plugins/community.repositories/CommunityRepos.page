@@ -99,23 +99,20 @@ function getContent(init,category) {
 > <span class='help3' style='display:none'>Deselect the <input type='checkbox' class='selectBeta' checked onchange='toggleBeta(this.checked)'><strong>Include Beta</strong> check box to exclude Beta Repositories from the main list / searches.</span>
 > <br><br>
 
-<img src='/plugins/community.repositories/images/categories/backup.png' width=150px  onclick='getContent(false,"backup");'>
-<img src='/plugins/community.repositories/images/categories/beta.png' width=150px  onclick='getContent(false,"BETA");'>
-<img src='/plugins/community.repositories/images/categories/cloud.png' width=150px onclick='getContent(false,"cloud");'>
-<img src='/plugins/community.repositories/images/categories/downloaders.png' width=150px onclick='getContent(false,"downloaders");'>
-<img src='/plugins/community.repositories/images/categories/internet.png' width=150px onclick='getContent(false,"internet");'>
-<img src='/plugins/community.repositories/images/categories/mediaApplications.png' width=150px onclick='getContent(false,"MediaApplication");'>
-<img src='/plugins/community.repositories/images/categories/mediaStreamer.png' width=150px onclick='getContent(false,"MediaStreamer");'>
-<img src='/plugins/community.repositories/images/categories/other.png' width=150px onclick='getContent(false,"other");'>
-
-
-<img src='/plugins/community.repositories/images/categories/productivity.png' width=150px onclick='getContent(false,"productivity");'>
-<img src='/plugins/community.repositories/images/categories/rdp.png' width=150px onclick='getContent(false,"rdp");'>
-<img src='/plugins/community.repositories/images/categories/toolsUtilities.png' width=150px onclick='getContent(false,"tools");'>
-<img src='/plugins/community.repositories/images/categories/uncategorized.png' width=150px onclick='getContent(false,"UNCATEGORIZED");'>
-<img src='/plugins/community.repositories/images/categories/all.png' width=150px onclick='getContent(false,"");'>
-<br>
-<br>
+<input type=button value='Backup' onclick='getContent(false,"backup");'></input>
+<input type=button value='Beta' onclick='getContent(false,"BETA");'></input>
+<input type=button value='Cloud' onclick='getContent(false,"cloud");'></input>
+<input type=button value='Downloaders' onclick='getContent(false,"downloaders");'></input>
+<input type=button value='Internet / Web' onclick='getContent(false,"internet");'></input>
+<input type=button value='Media Applications' onclick='getContent(false,"MediaApplication");'></input>
+<input type=button value='Media Streamers' onclick='getContent(false,"MediaStreamer");'></input>
+<input type=button value='Other' onclick='getContent(false,"other");'></input>
+<input type=button value='Productivity' onclick='getContent(false,"productivity");'></input>
+<input type=button value='RDP' onclick='getContent(false,"rdp");'></input>
+<input type=button value='Tools / Utilities' onclick='getContent(false,"tools");'></input>
+<input type=button value='Uncategorized' onclick='getContent(false,"UNCATEGORIZED");'></input>
+<input type=button value='All Containers' onclick='getContent(false,"");'></input>
+<br> <br> <br>
 
 <table id='templates_list' class='tablesorter <?=$shift?>'>
 <thead><th></th><th>Container</th><th style='width:40px'>Status</th><th>Author</th><th>Description</th><th>Category</th><th>Repository</th></tr></thead>
