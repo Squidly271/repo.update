@@ -158,6 +158,13 @@ class Community {
           $o['Repository']  = stripslashes($doc->getElementsByTagName( "Repository" )->item(0)->nodeValue);
           $o['Author']      = preg_replace("#/.*#", "", $o['Repository']);
           $o['Name']        = stripslashes($doc->getElementsByTagName( "Name" )->item(0)->nodeValue);
+
+          if ( $doc->getElementsByTagName( "Category" )->length ) {
+            $o['Category'] = $doc->getElementsByTagName ("Category" )->item(0)->nodeValue;
+          } else {
+            $o['Category'] = "UNCATEGORIZED";
+          }
+
           if ( $doc->getElementsByTagName( "Overview" )->length ) {
             $o['Description'] = stripslashes($doc->getElementsByTagName( "Overview" )->item(0)->nodeValue);
             $o['Description'] = preg_replace('#\[([^\]]*)\]#', '<$1>', $o['Description']);
@@ -165,7 +172,7 @@ class Community {
             $o['Description'] = stripslashes($doc->getElementsByTagName( "Description" )->item(0)->nodeValue);
             $o['Description'] = preg_replace("#\[br\s*\]#i", "{}", $o['Description']);
             $o['Description'] = preg_replace("#\[b[\\\]*\s*\]#i", "||", $o['Description']);
-            $o['Description'] = preg_replace('#\[([^\]]*)\]#', '<$1>', $o['Description']);
+           $o['Description'] = preg_replace('#\[([^\]]*)\]#', '<$1>', $o['Description']);
             $o['Description'] = preg_replace("#<span.*#si", "", $o['Description']);
             $o['Description'] = preg_replace("#<[^>]*>#i", '', $o['Description']);
             $o['Description'] = preg_replace("#"."{}"."#i", '<br>', $o['Description']);
@@ -208,25 +215,10 @@ function in_docker_repos($url) {
 }
 
 switch ($_POST['action']) {
-case 'toggle_repo':
-  $url = urldecode(($_POST['url']));
-  $file = is_file($docker_repos) ? file($docker_repos,FILE_IGNORE_NEW_LINES) : array();
-  if ( in_array($url, $file) ){
-    $file = preg_grep("#${url}#i", $file, PREG_GREP_INVERT);
-    $status = "disabled";
-  } else {
-    $file[] = $url;
-    $status="enabled";
-  }
-  file_put_contents($docker_repos, implode(PHP_EOL, $file));
-  $DockerTemplates = new DockerTemplates();
-  $DockerTemplates->downloadTemplates();
-  echo json_encode(array('status'=>$status));
-  break;
 
 case 'get_content':
   $filter = isset($_POST['filter']) ? urldecode(($_POST['filter'])) : false;
-  $beta = isset($_POST['beta']) ? $_POST['beta']=='true' : false;
+  $category = isset($_POST['category']) ? '/'.urldecode(($_POST['category'])).'/i' : false;
   $docker_repos = is_file($docker_repos) ? file($docker_repos,FILE_IGNORE_NEW_LINES) : array();
   if (!file_exists($infoFile)) {
     $Community = new Community();
@@ -238,40 +230,64 @@ case 'get_content':
   $file = json_decode(@file_get_contents($infoFile),true);
   if (!is_array($file)) break;
 
+  $runningDockers=str_replace('/','',shell_exec('docker ps'));
+  $imagesDocker=str_replace('/','',shell_exec('docker images'));
+
   $ct='';
   foreach ($file as $repo) {
-    if (!$beta && stripos($repo['name'],' beta')) continue;
-    $img = in_docker_repos($repo['url']) ? "src='/plugins/$plugin/images/red.png' title='Click to remove repository'" : "src='/plugins/$plugin/images/green.png' title='Click to add repository'";
     $label = $filter ? "<h3>{$repo['name']}</h3>" : "<a href='#' title='Click to show/hide dockers' class='toggle'><h3>{$repo['name']}</h3></a><img $img style='width:48px;height:48px;cursor:pointer' onclick='toggleRepo(this,\"{$repo['url']}\")'>";
     $forum = isset($repo['forum']) ? $repo['forum'] : "";
     $t = "";
     $i = 0;
     foreach ($repo['templates'] as $template) {
       $name = $template['Name'];
+
+      if ( strcmp($category,"/BETA/i") == 0 ) {
+        if ( (! stripos($repo['name'],' beta'))) {
+                continue;
+        } 
+      } else {
+        if ( $category && ! preg_match($category, $template['Category'])) { continue; }
+     }
       if ($filter) {
          if (preg_match("#$filter#i", $template['Name']) || preg_match("#$filter#i", $template['Author']) || preg_match("#$filter#i", $template['Description'])) {
-            $template['Description'] = highlight($filter, $template['Description']); $tr_td = "<tr><td style='text-align:left'>$label</td>";
+            $template['Description'] = highlight($filter, $template['Description']); $tr_td = "<tr>";
             $template['Author'] = highlight($filter, $template['Author']);
             $template['Name'] = highlight($filter, $name);
 	       } else continue;
       } else {
-        $c = $i ? "" : " class='topRow'";
-        $tr_td = $i++ ? "<tr class='expand-child'>" : "<tr><td${c} rowspan='_ROWS_' style='text-align:left;vertical-align:top'>$label (_ROWS_)</td>";
+        $c = "";
+        $tr_td = "<tr>";
       }
+
+      $dockerRepo="/".str_replace('/','',$template['Repository'])."/i";
+
+      if ( preg_match($dockerRepo, $imagesDocker) ) {
+        $dockerStatus = preg_match($dockerRepo, $runningDockers) ? "<img src='/plugins/$plugin/images/running.png' style='width:20px' title='Currently Running'><a hidden>running</a>"
+          : "<img src='/plugins/$plugin/images/download.png' style='width:20px' title='Installed / Not Running' href='/plugins/dockerMan'><a hidden>downloaded</a>";
+      } else {
+        $dockerStatus = "";
+      }
+      if ( stripos($repo['name'],' beta')) {
+        $dockerStatus .= "<img src='/plugins/$plugin/images/beta.png' style='width:20px' title='Beta Container'>";
+      }
+
       $selected = $info[$name]['template'] && stripos($info[$name]['icon'], $template['Author']) !== false;
-      $t .= sprintf("$tr_td<td${c} style='text-align:center;margin:0;padding:0'><a href='/Docker/%s' title='Click to %s container'><img src='%s' style='width:48px;height:48px;'></a></td><td${c}>%s</td><td${c}>%s%s</td><td${c}>%s</td><td${c}><span class='desc_readmore' style='display:block'>%s</span></td></tr>",
+      $t .= sprintf("$tr_td<td${c} style='text-align:center;margin:0;padding:0'><a href='/Docker/%s' title='Click to %s container'><img src='%s' style='width:48px;height:48px;'></a></td><td${c}>%s%s</td><td>%s<td${c}>%s</td><td${c}><span class='desc_readmore' style='display:block'>%s</span></td><td>%s</td><td><font size=1px>%s</font></td></tr>",
            ($selected ? "UpdateContainer?xmlTemplate=edit:".addslashes($info[$name]['template']) : "AddContainer?xmlTemplate=default:".addslashes($template['Path'])),
            ($selected ? "edit" : "add"),
            ($template['Icon'] ? $template['Icon'] : "/plugins/$plugin/images/question.png"),
-           ($selected ? "<i class='fa fa-wrench'></i>" : ""),
             $template['Name'],
            ($template['Support'] ? "<div><a href='".$template['Support']."' target='_blank'>[Support]</a></div>" : ""),
+            $dockerStatus,
             $template['Author'],
-            $template['Description']);
+            $template['Description'],
+           ($template['Category'] == "UNCATEGORIZED" ? "" : $template['Category']),
+            $repo['name']);
     }
     $ct .= str_replace('_ROWS_',$i,$t);
   }
-  echo $ct ? $ct : "<tr><td colspan='5'><br><center>No matching content found</center></td></tr>";
+  echo $ct ? $ct : "<tr><td colspan='7'><br><center>No matching content found</center></td></tr>";
   break;
 
 case 'force_update':
