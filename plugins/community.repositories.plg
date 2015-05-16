@@ -2,7 +2,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "community.repositories">
 <!ENTITY author    "gfjardim/bergware/Squid">
-<!ENTITY version   "2015.05.09">
+<!ENTITY version   "2015.05.16">
 <!ENTITY launch    "Docker">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY github    "Squidly271/repo.update">
@@ -12,6 +12,10 @@
 <PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;">
 
 <CHANGES>
+###2015.05.16###
+- Fixed display abberation introduced by 6.0RC-1 in tabbed view
+- For running containers, clicking the wrench edits the container.  Clicking the icon re-adds it using default values
+
 ###2015.05.09###
 - Clicking an installed container now edits existing settings
 
