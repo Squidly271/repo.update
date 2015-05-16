@@ -19,12 +19,12 @@ var last = $('input[name$="tabs"]').length;
 $(function(){
 <?if ($tabbed):?>
 <?$shift = 'shift2';?>
-  $('.tabs').append("<span id='searchFilter' class='status vhshift' style='display:none'><input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' onclick='forceUpdate()'></span>");
+  $('.tabs').append("<span id='searchFilter' class='status vhshift' style='display:none'><input type='checkbox' id='selectBeta' onchange='toggleBeta(this.checked)'>Include Beta<input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' onclick='forceUpdate()'><input type='button' id='openclose' value='Show' style='margin-left:-5px' onclick='openClose(this.value)'></span>");
   for (var x=1; x<last; x++) $('#tab'+x).bind({click:function(){$('#searchFilter').hide();}});
   $('#tab'+last).bind({click:function(){$('#searchFilter').show();readMore();}});
 <?else:?>
 <?$shift = 'shift';?>
-  $('div[id=title]').last().append("<span id='searchFilter' class='status vhshift'><input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' onclick='forceUpdate()'>");
+  $('div[id=title]').last().append("<span id='searchFilter' class='status vhshift'><input type='checkbox' id='selectBeta' onchange='toggleBeta(this.checked)'>Include Beta<input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' onclick='forceUpdate()'><input type='button' id='openclose' value='Show' style='margin-left:-5px' onclick='openClose(this.value)'></span>");
 <?endif;?>
   getContent(true);
   $('#searchBox').keyup(function(e) {if(e.which == 13){doSearch(false);}});
@@ -34,6 +34,11 @@ function readMore() {
   $('.desc_readmore').readmore({maxHeight:50});
 }
 
+function toggleBeta(state) {
+  $('#selectBeta,.selectBeta').prop('checked',state);
+  $('.help3').toggle();
+  doSearch(false);
+}
 
 function doSearch(button) {
   var filter = $('#searchBox').val();
@@ -45,7 +50,7 @@ function doSearch(button) {
     $('#searchBox').val('');
   } else if (!filter) return;
   $('#BackToTop').hide();
-  $.post(URL,{action:'get_content',filter:filter},function(data) {
+  $.post(URL,{action:'get_content',filter:filter,beta:$('#selectBeta').is(':checked')},function(data) {
     if (data) $('#templates_content').html(data);
     $('#templates_list').trigger('update',true);
     readMore();
@@ -60,16 +65,17 @@ function forceUpdate() {
   $.post(URL,{action:'force_update'},function(){getContent(false);});
 }
 
-function getContent(init,category) {
+function getContent(init) {
   $('#BackToTop').hide();
-  $.post(URL,{action:'get_content',category:category},function(data) {
+  $.post(URL,{action:'get_content',beta:$('#selectBeta').is(':checked')},function(data) {
     if (data) $('#templates_content').html(data);
     if (init) {
-      $('#templates_list').tablesorter({sortList:[[0,0]],headers:{0:{sorter:false},4:{sorter:false}}});
+      $('#templates_list').tablesorter({sortList:[[0,0]],headers:{1:{sorter:false},2:{sorter:false},5:{sorter:false}}});
     } else {
       $('#templates_list').trigger('update',true);
     }
     readMore();
+    if ($('#openclose').val()=='Show') $('#templates_list .expand-child td').hide();
     $('#BackToTop').show();
     if (init) {
       $('#templates_list').on('click','.toggle',function() {
@@ -80,8 +86,33 @@ function getContent(init,category) {
   });
 }
 
-</script>
+function toggleRepo(img, url) {
+  $(img).load(function(){
+    $.post(URL,{action:'toggle_repo', url:url},function(data) {
+      if(data.status){ if(data.status == 'enabled'){
+        $(img).attr('title',imgRed.title).attr('src',imgRed.src);
+      } else {
+        $(img).attr('title',imgGreen.title).attr('src',imgGreen.src);
+      }
+    }},'json');
+    $(img).unbind('load');
+  });
+  $(img).attr('src', '/plugins/<?=$plugin;?>/images/spinner.gif');
+}
 
+function openClose(action) {
+  if (action=='Show') {
+    $('#templates_list .expand-child td').show();
+    $('#openclose').val('Hide');
+  } else {
+    $('#templates_list .expand-child td').hide();
+    $('#openclose').val('Show');
+  }
+  readMore();
+  $('.help2').toggle();
+}
+</script>
+<br>
 > <span class='help1'>Click on the <strong>name</strong> of the repository to show / hide all of the available containers within this repository.</span>
 >
 > <span class='help1'>Click on <img src='/plugins/community.repositories/images/green.png' width=25> to add a repository to the list of templates or <img src='/plugins/community.repositories/images/red.png' width=25> to remove a repository from the list of templates.</span>
@@ -99,23 +130,8 @@ function getContent(init,category) {
 > <span class='help3' style='display:none'>Deselect the <input type='checkbox' class='selectBeta' checked onchange='toggleBeta(this.checked)'><strong>Include Beta</strong> check box to exclude Beta Repositories from the main list / searches.</span>
 > <br><br>
 
-<input type=button value='Backup' onclick='getContent(false,"backup");'></input>
-<input type=button value='Beta' onclick='getContent(false,"BETA");'></input>
-<input type=button value='Cloud' onclick='getContent(false,"cloud");'></input>
-<input type=button value='Downloaders' onclick='getContent(false,"downloaders");'></input>
-<input type=button value='Internet / Web' onclick='getContent(false,"internet");'></input>
-<input type=button value='Media Applications' onclick='getContent(false,"MediaApplication");'></input>
-<input type=button value='Media Streamers' onclick='getContent(false,"MediaStreamer");'></input>
-<input type=button value='Other' onclick='getContent(false,"other");'></input>
-<input type=button value='Productivity' onclick='getContent(false,"productivity");'></input>
-<input type=button value='RDP' onclick='getContent(false,"rdp");'></input>
-<input type=button value='Tools / Utilities' onclick='getContent(false,"tools");'></input>
-<input type=button value='Uncategorized' onclick='getContent(false,"UNCATEGORIZED");'></input>
-<input type=button value='All Containers' onclick='getContent(false,"");'></input>
-<br> <br> <br>
-
 <table id='templates_list' class='tablesorter <?=$shift?>'>
-<thead><th></th><th>Container</th><th style='width:40px'>Status</th><th>Author</th><th>Description</th><th>Category</th><th>Repository</th></tr></thead>
+<thead><tr><th style='width:220px'>Repository</th><th style='width:64px'></th><th style='width:16px'></th><th>Container</th><th>Author</th><th>Description</th></tr></thead>
 <tbody id='templates_content'><?=$waiting?></tbody>
 </table>
 <a href="#" id="BackToTop" onclick="var top=<?if ($tabbed):?>0<?else:?>$('div[id=title]').last().offset().top<?endif;?>;$('html,body').animate({scrollTop:top},'slow')">Back To Top</a>
