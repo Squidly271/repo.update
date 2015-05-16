@@ -115,7 +115,7 @@ The 'remove' script.
 <INLINE>
 removepkg &name;-&version;
 rm -rf &plugdir;
-# rm -rf /boot/config/plugins/&name;
+rm -rf /boot/config/plugins/&name;
 rm -rf /var/lib/docker/unraid/templates-community
 </INLINE>
 </FILE> 
