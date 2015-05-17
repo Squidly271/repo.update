@@ -259,11 +259,19 @@ case 'get_content':
         $tr_td = $i++ ? "<tr class='expand-child'>" : "<tr><td${c} rowspan='_ROWS_' style='text-align:left;vertical-align:top'>$label (_ROWS_)</td>";
       }
       $selected = $info[$name]['template'] && stripos($info[$name]['icon'], $template['Author']) !== false;
+<<<<<<< HEAD
       $t .= sprintf("$tr_td<td${c} style='text-align:center;margin:0;padding:0'><a href='/Docker/%s' title='Click to %s container'><div style='position: relative; width: 48px; height: 48px; margin: 0px auto'><img src='%s' style='position:absolute;z-index:1;opacity:1.0;top:0;bottom:0;left:0;right:0;width:48px;height:48px;'>%s</a></div></td><td${c}>%s%s</td><td${c}>%s</td><td${c}><span class='desc_readmore' style='display:block'>%s</span></td></tr>",
            ($selected ? "UpdateContainer?xmlTemplate=edit:".addslashes($info[$name]['template']) : "AddContainer?xmlTemplate=default:".addslashes($template['Path'])),
            ($selected ? "edit" : "add"),
            ($template['Icon'] ? $template['Icon'] : "/plugins/$plugin/images/question.png"),
            ($selected ? "<i class='fa iconstatus fa-wrench'></i>" : ""),
+=======
+      $t .= sprintf("$tr_td<td${c} style='text-align:center;margin:0;padding:0'><a href='/Docker/%s' title='Click to %s container'><img src='%s' style='width:48px;height:48px;'></a></td><td${c}>%s</td><td${c}>%s%s</td><td${c}>%s</td><td${c}><span class='desc_readmore' style='display:block'>%s</span></td></tr>",
+           ($selected ? "UpdateContainer?xmlTemplate=edit:".addslashes($info[$name]['template']) : "AddContainer?xmlTemplate=default:".addslashes($template['Path'])),
+           ($selected ? "edit" : "add"),
+           ($template['Icon'] ? $template['Icon'] : "/plugins/$plugin/images/question.png"),
+           ($selected ? "<i class='fa fa-wrench'></i>" : ""),
+>>>>>>> Squidly271/master
             $template['Name'],
            ($template['Support'] ? "<div><a href='".$template['Support']."' target='_blank'>[Support]</a></div>" : ""),
             $template['Author'],
