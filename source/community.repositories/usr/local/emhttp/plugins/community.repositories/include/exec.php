@@ -238,7 +238,6 @@ case 'get_content':
   $ct='';
   $i=0;
   foreach ($file as $repo) {
-    $label = $filter ? "<h3>{$repo['name']}</h3>" : "<a href='#' title='Click to show/hide dockers' class='toggle'><h3>{$repo['name']}</h3></a><img $img style='width:48px;height:48px;cursor:pointer' onclick='toggleRepo(this,\"{$repo['url']}\")'>";
     $forum = isset($repo['forum']) ? $repo['forum'] : "";
     $t = "";
     foreach ($repo['templates'] as $template) {
@@ -266,30 +265,33 @@ case 'get_content':
 
       if ( preg_match($dockerRepo, $imagesDocker) ) {
         $dockerStatus = preg_match($dockerRepo, $runningDockers) ? "<img src='/plugins/$plugin/images/running.png' style='width:20px' title='Currently Running'><a hidden>running</a>"
-          : "<img src='/plugins/$plugin/images/download.png' style='width:20px' title='Installed / Not Running' href='/plugins/dockerMan'><a hidden>downloaded</a>";
+          : "<img src='/plugins/$plugin/images/wrench.png' style='width:30px' title='Installed / Not Running' href='/plugins/dockerMan'><a hidden>downloaded</a>";
       } else {
         $dockerStatus = "";
       }
 
+      $dockerName = $template['Name'];
+
       if ( ( $template['Beta'] == "true" ) || ( ! stripos($repo['name'],' beta') == 0 )) {
-        $dockerStatus .= "<img src='/plugins/$plugin/images/beta.png' style='width:20px' title='Beta Container'>";
+        $dockerName .= "<span title=' Beta Container'><font size='1' color='red'><strong> (beta)</strong></font></span>";
       }
       
       $i=++$i;
       $selected = $info[$name]['template'] && stripos($info[$name]['icon'], $template['Author']) !== false;
-      $t .= sprintf("$tr_td<td${c} style='text-align:center;margin:0;padding:0'><a href='/Docker/%s' title='Click to %s container'><img src='%s' style='width:48px;height:48px;'></a></td><td${c}>%s%s</td><td>%s<td${c}>%s</td><td${c}><span class='desc_readmore' style='display:block'>%s</span></td><td>%s</td><td><font size=1px>%s</font></td></tr>",
-           ($selected ? "UpdateContainer?xmlTemplate=edit:".addslashes($info[$name]['template']) : "AddContainer?xmlTemplate=default:".addslashes($template['Path'])),
-           ($selected ? "edit" : "add"),
+      $t .= sprintf("$tr_td<td${c} style='text-align:center;margin:0;padding:0'><a href='/Docker/%s' title='Click to %s container' target='_blank'><img src='%s' style='width:48px;height:48px;'></a><img src='/plugins/$plugin/images/wrench.png' style='width:30px;visibility:%s'</td><td${c}>%s%s</td><td>%s<td${c}>%s</td><td${c}><span class='desc_readmore' style='display:block' title='Categories: %s'>%s</span></td><td><font size=1px>%s</font></td></tr>",
+           ($dockerStatus ? "UpdateContainer?xmlTemplate=edit:".addslashes($info[$name]['template']) : "AddContainer?xmlTemplate=default:".addslashes($template['Path'])),
+           ($dockerStatus ? "edit" : "add"),
            ($template['Icon'] ? $template['Icon'] : "/plugins/$plugin/images/question.png"),
-            $template['Name'],
-           ($template['Support'] ? "<div><a href='".$template['Support']."' target='_blank'>[Support]</a></div>" : ""),
+           ($selected ? "" : "hidden"),
+            $dockerName,
+           ($template['Support'] ? "<div><a href='".$template['Support']."' target='_blank' title='Click to go to the support thread'>[Support]</a></div>" : ""),
             $dockerStatus,
             $template['Author'],
+           $template['Category'],
             $template['Description'],
-           ($template['Category'] == "UNCATEGORIZED" ? "" : $template['Category']),
             $repo['name']);
     }
-    $ct .= str_replace('_ROWS_',$i,$t);
+     $ct .= $t;
   }
 
 

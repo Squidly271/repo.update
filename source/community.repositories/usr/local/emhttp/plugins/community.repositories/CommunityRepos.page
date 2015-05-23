@@ -121,23 +121,6 @@ function getContent(init,category,description) {
 }
 
 </script>
-> <span class='help1'>Click on the <strong>name</strong> of the repository to show / hide all of the available containers within this repository.</span>
->
-> <span class='help1'>Click on <img src='/plugins/community.repositories/images/green.png' width=25> to add a repository to the list of templates or <img src='/plugins/community.repositories/images/red.png' width=25> to remove a repository from the list of templates.</span>
->
-> Click on the <strong>icon</strong> of the container to add the single container (a new window will open).
->
-> Click <input type='button' value='Update Repositories' style='margin:0 2px' onclick='forceUpdate()'> to force an update of all repositories and containers.
->
-> <span class='help1'>
-> <span class='help2'>Click <input type='button' value='Show' style='margin:0 2px' onclick='openClose(this.value)'> to display all available containers within the repositories.</span>
-> <span class='help2' style='display:none'>Click <input type='button' value='Hide' style='margin:0 2px' onclick='openClose(this.value)'> to only display the first container within a repository.</span>
-> </span>
->
-> <span class='help3'>Select the <input type='checkbox' class='selectBeta' onchange='toggleBeta(this.checked)'><strong>Include Beta</strong> check box to include Beta Repositories in the main list / searches.</span>
-> <span class='help3' style='display:none'>Deselect the <input type='checkbox' class='selectBeta' checked onchange='toggleBeta(this.checked)'><strong>Include Beta</strong> check box to exclude Beta Repositories from the main list / searches.</span>
-> <br>
-
 <span id='MainCategory'>
 <input type=button value='Backup' onclick='getContent(false,"backup:","Backup");'></input>
 <input type=button value='Cloud' onclick='getContent(false,"cloud:","Cloud");'></input>
@@ -181,7 +164,7 @@ function getContent(init,category,description) {
 
 Current Category: <strong><font size="3"><span id="Category">All Containers</span></font></strong><span style='float: right';>Total Found: <strong><font size="3"><span id="Total"></span></font></strong></span>
 <table id='templates_list' class='tablesorter <?=$shift?>'>
-<thead><th></th><th>Container</th><th style='width:40px'>Status</th><th>Author</th><th>Description</th><th>Category</th><th>Repository</th></tr></thead>
+<thead><th style='width:80px'></th><th>Container</th><th style='width:40px'>Status</th><th>Author</th><th>Description</th><th>Repository</th></tr></thead>
 <tbody id='templates_content'><?=$waiting?></tbody>
 </table>
 <a href="#" id="BackToTop" onclick="var top=<?if ($tabbed):?>0<?else:?>$('div[id=title]').last().offset().top<?endif;?>;$('html,body').animate({scrollTop:top},'slow')">Back To Top</a>
