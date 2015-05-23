@@ -14,7 +14,6 @@ $info                                       = $DockerTemplates->getAllInfo();
 # Make sure the link is in place
 if (is_dir("/usr/local/emhttp/state/plugins/$plugin")) exec("rm -rf /usr/local/emhttp/state/plugins/$plugin");
 if (!is_link("/usr/local/emhttp/state/plugins/$plugin")) symlink($dockerManPaths['templates-community'], "/usr/local/emhttp/state/plugins/$plugin");
-
 class Community {
   public $verbose = false;
   private function debug($m) {
@@ -237,11 +236,11 @@ case 'get_content':
   $imagesDocker=str_replace('/','',shell_exec('docker images'));
 
   $ct='';
+  $i=0;
   foreach ($file as $repo) {
     $label = $filter ? "<h3>{$repo['name']}</h3>" : "<a href='#' title='Click to show/hide dockers' class='toggle'><h3>{$repo['name']}</h3></a><img $img style='width:48px;height:48px;cursor:pointer' onclick='toggleRepo(this,\"{$repo['url']}\")'>";
     $forum = isset($repo['forum']) ? $repo['forum'] : "";
     $t = "";
-    $i = 0;
     foreach ($repo['templates'] as $template) {
       $name = $template['Name'];
 
@@ -275,7 +274,8 @@ case 'get_content':
       if ( ( $template['Beta'] == "true" ) || ( ! stripos($repo['name'],' beta') == 0 )) {
         $dockerStatus .= "<img src='/plugins/$plugin/images/beta.png' style='width:20px' title='Beta Container'>";
       }
-
+      
+      $i=++$i;
       $selected = $info[$name]['template'] && stripos($info[$name]['icon'], $template['Author']) !== false;
       $t .= sprintf("$tr_td<td${c} style='text-align:center;margin:0;padding:0'><a href='/Docker/%s' title='Click to %s container'><img src='%s' style='width:48px;height:48px;'></a></td><td${c}>%s%s</td><td>%s<td${c}>%s</td><td${c}><span class='desc_readmore' style='display:block'>%s</span></td><td>%s</td><td><font size=1px>%s</font></td></tr>",
            ($selected ? "UpdateContainer?xmlTemplate=edit:".addslashes($info[$name]['template']) : "AddContainer?xmlTemplate=default:".addslashes($template['Path'])),
@@ -291,7 +291,10 @@ case 'get_content':
     }
     $ct .= str_replace('_ROWS_',$i,$t);
   }
+
+
   echo $ct ? $ct : "<tr><td colspan='7'><br><center>No matching content found</center></td></tr>";
+  echo "<script>document.getElementById('Total').innerHTML = $i;</script>";
   break;
 
 case 'force_update':
