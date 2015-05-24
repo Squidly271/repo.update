@@ -263,29 +263,28 @@ case 'get_content':
 
       $dockerRepo="/".str_replace('/','',$template['Repository'])."/i";
 
+      $dockerStatus = "";
       if ( preg_match($dockerRepo, $imagesDocker) ) {
-        $dockerStatus = preg_match($dockerRepo, $runningDockers) ? "<img src='/plugins/$plugin/images/running.png' style='width:20px' title='Currently Running'><a hidden>running</a>"
-          : "<img src='/plugins/$plugin/images/wrench.png' style='width:30px' title='Installed / Not Running' href='/plugins/dockerMan'><a hidden>downloaded</a>";
-      } else {
-        $dockerStatus = "";
+        $dockerStatus = preg_match($dockerRepo, $runningDockers) ? "Currently running" : "Currently not running";
       }
 
       $dockerName = $template['Name'];
 
       if ( ( $template['Beta'] == "true" ) || ( ! stripos($repo['name'],' beta') == 0 )) {
-        $dockerName .= "<span title=' Beta Container'><font size='1' color='red'><strong> (beta)</strong></font></span>";
+        $dockerName .= "<span title='Beta Container &#13;See support forum for potential issues'><font size='1' color='red'><strong>(beta)</strong></font></span>";
       }
-      
+
       $i=++$i;
       $selected = $info[$name]['template'] && stripos($info[$name]['icon'], $template['Author']) !== false;
-      $t .= sprintf("$tr_td<td${c} style='text-align:center;margin:0;padding:0'><a href='/Docker/%s' title='Click to %s container' target='_blank'><img src='%s' style='width:48px;height:48px;'></a><img src='/plugins/$plugin/images/wrench.png' style='width:30px;visibility:%s'</td><td${c}>%s%s</td><td>%s<td${c}>%s</td><td${c}><span class='desc_readmore' style='display:block' title='Categories: %s'>%s</span></td><td><font size=1px>%s</font></td></tr>",
-           ($dockerStatus ? "UpdateContainer?xmlTemplate=edit:".addslashes($info[$name]['template']) : "AddContainer?xmlTemplate=default:".addslashes($template['Path'])),
-           ($dockerStatus ? "edit" : "add"),
+
+      $t .= sprintf("$tr_td<td${c} style='text-align:center;margin:0;padding:0'><a href='/Docker/%s' title='%s' target='_blank'><img src='%s' style='width:48px;height:48px;'></a><a href='/Docker/%s' target='_blank' title='Currently installed &#13;Click to edit application'><img src='/plugins/$plugin/images/wrench.png' style='width:30px;visibility:%s'></a></td><td${c}>%s%s</td><td${c}>%s</td><td${c}><span class='desc_readmore' style='display:block' title='Categories: %s'>%s</span></td><td><font size=1px>%s</font></td></tr>",
+            "AddContainer?xmlTemplate=default:".addslashes($template['Path']),
+           ($selected ? "Currently Installed &#13;Click to reinstall application using default values" : "Click to install application"),
            ($template['Icon'] ? $template['Icon'] : "/plugins/$plugin/images/question.png"),
+            "UpdateContainer?xmlTemplate=edit:".addslashes($info[$name]['template']),
            ($selected ? "" : "hidden"),
             $dockerName,
            ($template['Support'] ? "<div><a href='".$template['Support']."' target='_blank' title='Click to go to the support thread'>[Support]</a></div>" : ""),
-            $dockerStatus,
             $template['Author'],
            $template['Category'],
             $template['Description'],

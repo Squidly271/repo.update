@@ -4,7 +4,7 @@ Cond="(pgrep('docker')!==false)"
 ---
 <?
 $plugin = "community.repositories";
-$waiting = "<tr><td colspan='5'><br><center><i class='fa fa-spinner fa-spin'></i>&nbsp;<em>Please wait... retrieving container's information!</em></center></td></tr>";
+$waiting = "<tr><td colspan='5'><br><center><i class='fa fa-spinner fa-spin'></i>&nbsp;<em>Please wait... retrieving application's information!</em></center></td></tr>";
 $line_color = $display['theme']=='black' ? '#202020' : '#E8E8E8';
 ?>
 <style>
@@ -16,11 +16,11 @@ var URL = "/plugins/<?=$plugin?>/include/exec.php";
 var last = $('input[name$="tabs"]').length;
 $(function(){
 <?if ($tabbed):?>
-  $('.tabs').append("<span id='searchFilter' class='status vhshift' style='display:none'><input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' onclick='forceUpdate()'></span>");
+  $('.tabs').append("<span id='searchFilter' class='status vhshift' style='display:none'><input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Applications' onclick='forceUpdate()'></span>");
   for (var x=1; x<last; x++) $('#tab'+x).bind({click:function(){$('#searchFilter').hide();}});
   $('#tab'+last).bind({click:function(){$('#searchFilter').show();readMore();}});
 <?else:?>
-  $('div[id=title]').last().append("<span id='searchFilter' class='status vhshift'><input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' onclick='forceUpdate()'>");
+  $('div[id=title]').last().append("<span id='searchFilter' class='status vhshift'><input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Applications' onclick='forceUpdate()'>");
 <?endif;?>
   getContent(true,'','All Containers');
   document.getElementById("Category").innerHTML = "All Containers";
@@ -164,7 +164,7 @@ function getContent(init,category,description) {
 
 Current Category: <strong><font size="3"><span id="Category">All Containers</span></font></strong><span style='float: right';>Total Found: <strong><font size="3"><span id="Total"></span></font></strong></span>
 <table id='templates_list' class='tablesorter <?=$shift?>'>
-<thead><th style='width:80px'></th><th>Container</th><th style='width:40px'>Status</th><th>Author</th><th>Description</th><th>Repository</th></tr></thead>
+<thead><th style='width:80px'></th><th>Container</th><th>Author</th><th>Description</th><th>Repository</th></tr></thead>
 <tbody id='templates_content'><?=$waiting?></tbody>
 </table>
 <a href="#" id="BackToTop" onclick="var top=<?if ($tabbed):?>0<?else:?>$('div[id=title]').last().offset().top<?endif;?>;$('html,body').animate({scrollTop:top},'slow')">Back To Top</a>
