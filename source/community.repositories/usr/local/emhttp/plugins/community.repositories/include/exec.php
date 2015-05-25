@@ -161,9 +161,9 @@ class Community {
 
           if ( stripos($Repos,' beta')) { $o['Beta'] = "true"; }
 
-          if ( $doc->getElementsByTagName( "Category" )->length ) {
-            $o['Category'] = $doc->getElementsByTagName ("Category" )->item(0)->nodeValue;
-          } else {
+          $o['Category'] = $doc->getElementsByTagName ("Category" )->item(0)->nodeValue;
+
+          if ( $o['Category'] == "" ) {
             $o['Category'] = "UNCATEGORIZED";
           }
 
@@ -295,7 +295,9 @@ case 'get_content':
 
 
   echo $ct ? $ct : "<tr><td colspan='7'><br><center>No matching content found</center></td></tr>";
-  echo "<script>document.getElementById('Total').innerHTML = $i;</script>";
+  $updateTime = filemtime('/usr/local/emhttp/state/plugins/community.repositories/templates.json');
+  echo "<script>document.getElementById('Total').innerHTML = $i;";
+  echo "document.getElementById('updateTime').innerHTML = '".date("F d Y H:i    ",$updateTime)."'; </script>";
   break;
 
 case 'force_update':
