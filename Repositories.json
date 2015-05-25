@@ -118,6 +118,11 @@
     "name": "xamindar's Repository",
 	"url": "https://github.com/xamindar/docker-containers/tree/master/docker-templates",
 	"forum": "http://lime-technology.com/forum/index.php?topic=39910.0"
+  },
+  {
+    "name": "Nativedude's Repository",
+	"url":  "https://github.com/Nativedude/docker-templates",
+	"forum": "http://lime-technology.com/forum/index.php?topic=40161.0"
   }
 ]
 
