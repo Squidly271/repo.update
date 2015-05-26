@@ -58,6 +58,7 @@ function doSearch(button) {
 }
 
 function forceUpdate() {
+  document.getElementById("updateTime").innerHTML = "In Progress...";
   $('#templates_content').html("<?=$waiting?>");
   document.getElementById("Total").innerHTML = "Updating...";
   if ($('#searchButton').hasClass('fa-remove')) { $('#searchButton').toggleClass('fa-remove fa-search'); $('#searchBox').val(''); }
