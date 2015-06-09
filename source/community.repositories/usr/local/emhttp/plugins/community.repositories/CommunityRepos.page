@@ -1,10 +1,10 @@
 Menu="Docker:4"
-Title="Community Applications"
+Title="Community Repositories"
 Cond="(pgrep('docker')!==false)"
 ---
 <?
 $plugin = "community.repositories";
-$waiting = "<tr><td colspan='5'><br><center><i class='fa fa-spinner fa-spin'></i>&nbsp;<em>Please wait... retrieving application information!</em></center></td></tr>";
+$waiting = "<tr><td colspan='5'><br><center><i class='fa fa-spinner fa-spin'></i>&nbsp;<em>Please wait... retrieving repositories information!</em></center></td></tr>";
 $line_color = $display['theme']=='black' ? '#202020' : '#E8E8E8';
 ?>
 <style>
@@ -13,22 +13,29 @@ table#templates_list tbody td.topRow{border-top:1px solid <?=$line_color?>;}
 </style>
 <script>
 var URL = "/plugins/<?=$plugin?>/include/exec.php";
+var imgRed = {src:"/plugins/<?=$plugin?>/images/red.png",title:'Click to remove container'};
+var imgGreen = {src:"/plugins/<?=$plugin?>/images/green.png",title:'Click to add container'};
 var last = $('input[name$="tabs"]').length;
 $(function(){
 <?if ($tabbed):?>
-  $('.tabs').append("<span id='searchFilter' class='status vhshift' style='display:none'><input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Applications' onclick='forceUpdate()'></span>");
+  $('.tabs').append("<span id='searchFilter' class='status vhshift' style='display:none'><input type='checkbox' id='selectBeta' onchange='toggleBeta(this.checked)'>Include Beta<input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' onclick='forceUpdate()'><input type='button' id='openclose' value='Show' style='margin-left:-5px' onclick='openClose(this.value)'></span>");
   for (var x=1; x<last; x++) $('#tab'+x).bind({click:function(){$('#searchFilter').hide();}});
   $('#tab'+last).bind({click:function(){$('#searchFilter').show();readMore();}});
 <?else:?>
-  $('div[id=title]').last().append("<span id='searchFilter' class='status vhshift'><input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Applications' onclick='forceUpdate()'>");
+  $('div[id=title]').last().append("<span id='searchFilter' class='status vhshift'><input type='checkbox' id='selectBeta' onchange='toggleBeta(this.checked)'>Include Beta<input type='text' id='searchBox' class='narrow' placeholder='Search' style='margin-left:10px;margin-right:0'><button class='searchSubmit' style='margin-right:10px' onclick='doSearch(true)'><i id='searchButton' class='fa fa-search fa-lg'></i></button><input type='button' value='Update Repositories' onclick='forceUpdate()'><input type='button' id='openclose' value='Show' style='margin-left:-5px' onclick='openClose(this.value)'></span>");
 <?endif;?>
-  getContent(true,'','All Applications');
-  document.getElementById("Category").innerHTML = "All Applications";
+  getContent(true);
   $('#searchBox').keyup(function(e) {if(e.which == 13){doSearch(false);}});
 });
 
 function readMore() {
   $('.desc_readmore').readmore({maxHeight:50});
+}
+
+function toggleBeta(state) {
+  $('#selectBeta,.selectBeta').prop('checked',state);
+  $('.help3').toggle();
+  doSearch(false);
 }
 
 function doSearch(button) {
@@ -41,131 +48,87 @@ function doSearch(button) {
     $('#searchBox').val('');
   } else if (!filter) return;
   $('#BackToTop').hide();
-  if (filter) { document.getElementById("Category").innerHTML="All Applications (Search Results)";
-  } else {
-    document.getElementById("Category").innerHTML="All Applications";
-  }
-  document.getElementById("NetworkCategory").hidden = true;
-  document.getElementById("MediaAppCategory").hidden = true;
-  document.getElementById("MediaServerCategory").hidden = true;
-  document.getElementById("MainCategory").hidden = false;
-  $.post(URL,{action:'get_content',filter:filter},function(data) {
+  $.post(URL,{action:'get_content',filter:filter,beta:$('#selectBeta').is(':checked')},function(data) {
     if (data) $('#templates_content').html(data);
     $('#templates_list').trigger('update',true);
     readMore();
+    if (!filter && $('#openclose').val()=='Show') $('#templates_list .expand-child td').hide();
     $('#BackToTop').show();
   });
 }
 
 function forceUpdate() {
-  document.getElementById("updateTime").innerHTML = "In Progress...";
   $('#templates_content').html("<?=$waiting?>");
-  document.getElementById("Total").innerHTML = "Updating...";
-  if ($('#searchButton').hasClass('fa-remove')) { $('#searchButton').toggleClass('fa-remove fa-search'); $('#searchBox').val(''); }
-  $.post(URL,{action:'force_update'},function(){getContent(false,'',"All Applications");});
+  if ($('#searchButton').hasClass('fa-remove')) { $('#searchButton').toggleClass('fa-remove fa-search'); $('#searchBox').val(''); $('.help1,#openclose').show(); }
+  $.post(URL,{action:'force_update'},function(){getContent(false);});
 }
 
-function getContent(init,category,description) {
-  document.getElementById("Total").innerHTML = "Searching...";
-
-  switch (category) {
-    case 'network:':
-      document.getElementById("MainCategory").hidden = true;
-      document.getElementById("NetworkCategory").hidden = false;
-      document.getElementById("Uncategorized").hidden = true;
-      document.getElementById("All").value = "All Categories";
-      break;
-    case 'MediaApp:':
-      document.getElementById("MainCategory").hidden = true;
-      document.getElementById("MediaAppCategory").hidden = false;
-      document.getElementById("Uncategorized").hidden = true;
-      document.getElementById("All").value = "All Categories";
-      break;
-    case 'MediaServer:':
-      document.getElementById("MainCategory").hidden = true;
-      document.getElementById("MediaServerCategory").hidden = false;
-      document.getElementById("Uncategorized").hidden = true;
-      document.getElementById("All").value = "All Categories";
-      break;
-    case 'UNCATEGORIZED':
-      document.getElementById("Category").innerHTML = "Uncategorized Applications";
-      document.getElementById("NetworkCategory").hidden = true;
-      document.getElementById("MainCategory").hidden = false;
-      break;
-    case '':
-      document.getElementById("NetworkCategory").hidden = true;
-      document.getElementById("MediaAppCategory").hidden = true;
-      document.getElementById("MediaServerCategory").hidden = true;
-      document.getElementById("MainCategory").hidden = false;
-      document.getElementById("Uncategorized").hidden = false;
-      document.getElementById("All").value = "All Applications";
-  }
-  document.getElementById("Category").innerHTML = "";
-      
+function getContent(init) {
   $('#BackToTop').hide();
-  $.post(URL,{action:'get_content',category:category},function(data) {
+  $.post(URL,{action:'get_content',beta:$('#selectBeta').is(':checked')},function(data) {
     if (data) $('#templates_content').html(data);
     if (init) {
-      $('#templates_list').tablesorter({sortList:[[1,0]],headers:{0:{sorter:false},3:{sorter:false}}});
+      $('#templates_list').tablesorter({sortList:[[0,0]],headers:{1:{sorter:false},2:{sorter:false},5:{sorter:false}}});
     } else {
       $('#templates_list').trigger('update',true);
     }
-    document.getElementById("Category").innerHTML = description;
     readMore();
+    if ($('#openclose').val()=='Show') $('#templates_list .expand-child td').hide();
     $('#BackToTop').show();
- });
+    if (init) {
+      $('#templates_list').on('click','.toggle',function() {
+        $(this).closest('tr').nextUntil('tr:not(.expand-child)').find('td').toggle();
+        return false;
+      });
+    }
+  });
+}
+
+function toggleRepo(img, url) {
+  $(img).load(function(){
+    $.post(URL,{action:'toggle_repo', url:url},function(data) {
+      if(data.status){ if(data.status == 'enabled'){
+        $(img).attr('title',imgRed.title).attr('src',imgRed.src);
+      } else {
+        $(img).attr('title',imgGreen.title).attr('src',imgGreen.src);
+      }
+    }},'json');
+    $(img).unbind('load');
+  });
+  $(img).attr('src', '/plugins/<?=$plugin;?>/images/spinner.gif');
+}
+
+function openClose(action) {
+  if (action=='Show') {
+    $('#templates_list .expand-child td').show();
+    $('#openclose').val('Hide');
+  } else {
+    $('#templates_list .expand-child td').hide();
+    $('#openclose').val('Show');
+  }
+  readMore();
+  $('.help2').toggle();
 }
 </script>
-<span id='MainCategory'>
-<input type=button value='Backup' style='margin:5px'; onclick='getContent(false,"backup:","Backup");'></input>
-<input type=button value='Cloud' style='margin:5px'; onclick='getContent(false,"cloud:","Cloud");'></input>
-<input type=button value='Downloaders' style='margin:5px'; onclick='getContent(false,"downloaders:","Downloaders");'></input>
-<input type=button value='Home Automation' style='margin:5px'; onclick='getContent(false,"HomeAutomation:","Home Automation");'></input>
-<input type=button value='Network Services' style='margin:5px'; onclick='getContent(false,"network:","All Network Services");'></input>
-<input type=button value='Media Applications' style='margin:5px'; onclick='getContent(false,"MediaApp:","All Media Applications");'></input>
-<input type=button value='Media Servers' style='margin:5px'; onclick='getContent(false,"MediaServer:","All Media Servers");'></input>
-<input type=button value='Productivity' style='margin:5px'; onclick='getContent(false,"productivity:","Productivity");'></input>
-<input type=button value='Tools/Utilities' style='margin:5px'; onclick='getContent(false,"tools:","Tools / Utilities");'></input>
-<input type=button value='Other' style='margin:5px'; onclick='getContent(false,"other:","Other");'></input>
-</span>
-<span id='NetworkCategory' hidden>
-<input type=button value='Web Servers' style='margin:5px'; onclick='getContent(false,"network:web","Network Services: Web Servers");'></input>
-<input type=button value='DNS Servers' style='margin:5px'; onclick='getContent(false,"network:dns","Network Services: DNS Servers");'></input>
-<input type=button value='FTP Clients / Servers' style='margin:5px'; onclick='getContent(false,"network:ftp","Network Services: FTP Clients / Servers");'></input>
-<input type=button value='Proxies' style='margin:5px'; onclick='getContent(false,"network:proxy","Network Services: Proxies");'></input>
-<input type=button value='VOIP' style='margin:5px'; onclick='getContent(false,"network:voip", "Network Services: VOIP");'></input>
-<input type=button value='Management / Analyzer' style='margin:5px'; onclick='getContent(false,"network:management","Network Services: Management / Analyzer");'></input>
-<input type=button value='Messengers' style='margin:5px'; onclick='getContent(false,"network:messenger","Network Services: Messengers");'></input>
-<input type=button value='Other' style='margin:5px'; onclick='getContent(false,"network:other","Network Services: Other");'></input>
-<input type=button value='All Network Services' style='margin:5px'; onclick='getContent(false,"network:","All Network Services");'></input>
-</span>
-<span id='MediaAppCategory' hidden>
-<input type=button value='Video' style='margin:5px'; onclick='getContent(false,"MediaApp:Video","Media Applications: Video");'></input>
-<input type=button value='Music' style='margin:5px'; onclick='getContent(false,"MediaApp:Music","Media Applications: Music");'></input>
-<input type=button value='Books / Comics' style='margin:5px'; onclick='getContent(false,"MediaApp:Books","Media Applications: Books / Comics");'></input>
-<input type=button value='Photos' style='margin:5px'; onclick='getContent(false,"MediaApp:Photos","Media Applications: Photos");'></input>
-<input type=button value='Other' style='margin:5px'; onclick='getContent(false,"MediaApp:other","Media Applications: Other");'></input>
-<input type=button value='All Media Applications' style='margin:5px'; onclick='getContent(false,"MediaApp:","All Media Applications");'></input>
-</span>
-<span id='MediaServerCategory' hidden>
-<input type=button value='Video' style='margin:5px'; onclick='getContent(false,"MediaServer:Video","Media Servers: Video");'></input>
-<input type=button value='Music' style='margin:5px'; onclick='getContent(false,"MediaServer:Music","Media Servers: Music");'></input>
-<input type=button value='Books / Comics' style='margin:5px'; onclick='getContent(false,"MediaServer:Books","Media Servers: Books / Comics");'></input>
-<input type=button value='Photos' style='margin:5px'; onclick='getContent(false,"MediaServer:Photos","Media Servers: Photos");'></input>
-<input type=button value='Other' style='margin:5px'; onclick='getContent(false,"MediaServer:other","Media Servers: Other");'></input>
-<input type=button value='All Media Server' style='margin:5px'; onclick='getContent(false,"MediaServer:","All Media Servers");'></input>
-</span>
-<span style='float:right'>||
-<input type=button id="Uncategorized" style='margin:5px'; value='Uncategorized' onclick='getContent(false,"UNCATEGORIZED","All Uncategorized Applications");'></input>
-<input type=button id="All" style='margin:5px'; value='All Applications' onclick='getContent(false,"","All Applications");'></input>
-</span>
+> <span class='help1'>Click on the <strong>name</strong> of the repository to show / hide all of the available containers within this repository.</span>
+>
+> <span class='help1'>Click on <img src='/plugins/community.repositories/images/green.png' width=25> to add a repository to the list of templates or <img src='/plugins/community.repositories/images/red.png' width=25> to remove a repository from the list of templates.</span>
+>
+> Click on the <strong>icon</strong> of the container to add the single container (a new window will open).
+>
+> Click <input type='button' value='Update Repositories' style='margin:0 2px' onclick='forceUpdate()'> to force an update of all repositories and containers.
+>
+> <span class='help1'>
+> <span class='help2'>Click <input type='button' value='Show' style='margin:0 2px' onclick='openClose(this.value)'> to display all available containers within the repositories.</span>
+> <span class='help2' style='display:none'>Click <input type='button' value='Hide' style='margin:0 2px' onclick='openClose(this.value)'> to only display the first container within a repository.</span>
+> </span>
+>
+> <span class='help3'>Select the <input type='checkbox' class='selectBeta' onchange='toggleBeta(this.checked)'><strong>Include Beta</strong> check box to include Beta Repositories in the main list / searches.</span>
+> <span class='help3' style='display:none'>Deselect the <input type='checkbox' class='selectBeta' checked onchange='toggleBeta(this.checked)'><strong>Include Beta</strong> check box to exclude Beta Repositories from the main list / searches.</span>
+> <br><br>
 
-
-Current Category: <strong><font size="3"><span id="Category">All Applications</span></font></strong><span style='float: right';>Total Found: <strong><font size="3"><span id="Total"></span></font></strong></span>
-<table id='templates_list' class='tablesorter <?=$shift?>'>
-<thead><th style='width:80px'></th><th>Container</th><th>Author</th><th>Description</th><th>Repository</th></tr></thead>
+<table id='templates_list' class='tablesorter shift'>
+<thead><tr><th style='width:220px'>Repository</th><th style='width:64px'></th><th style='width:16px'></th><th>Container</th><th>Author</th><th>Description</th></tr></thead>
 <tbody id='templates_content'><?=$waiting?></tbody>
 </table>
 <a href="#" id="BackToTop" onclick="var top=<?if ($tabbed):?>0<?else:?>$('div[id=title]').last().offset().top<?endif;?>;$('html,body').animate({scrollTop:top},'slow')">Back To Top</a>
-<center>Last Check For Updates: <strong><span id='updateTime'></span></strong></center><br>
-

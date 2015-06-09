@@ -14,6 +14,7 @@ $info                                       = $DockerTemplates->getAllInfo();
 # Make sure the link is in place
 if (is_dir("/usr/local/emhttp/state/plugins/$plugin")) exec("rm -rf /usr/local/emhttp/state/plugins/$plugin");
 if (!is_link("/usr/local/emhttp/state/plugins/$plugin")) symlink($dockerManPaths['templates-community'], "/usr/local/emhttp/state/plugins/$plugin");
+
 class Community {
   public $verbose = false;
   private function debug($m) {
@@ -157,16 +158,6 @@ class Community {
           $o['Repository']  = stripslashes($doc->getElementsByTagName( "Repository" )->item(0)->nodeValue);
           $o['Author']      = preg_replace("#/.*#", "", $o['Repository']);
           $o['Name']        = stripslashes($doc->getElementsByTagName( "Name" )->item(0)->nodeValue);
-          $o['Beta']        = strtolower(stripslashes($doc->getElementsByTagName( "Beta" )->item(0)->nodeValue));
-
-          if ( stripos($Repos,' beta')) { $o['Beta'] = "true"; }
-
-          $o['Category'] = $doc->getElementsByTagName ("Category" )->item(0)->nodeValue;
-
-          if ( $o['Category'] == "" ) {
-            $o['Category'] = "UNCATEGORIZED";
-          }
-
           if ( $doc->getElementsByTagName( "Overview" )->length ) {
             $o['Description'] = stripslashes($doc->getElementsByTagName( "Overview" )->item(0)->nodeValue);
             $o['Description'] = preg_replace('#\[([^\]]*)\]#', '<$1>', $o['Description']);
@@ -174,7 +165,7 @@ class Community {
             $o['Description'] = stripslashes($doc->getElementsByTagName( "Description" )->item(0)->nodeValue);
             $o['Description'] = preg_replace("#\[br\s*\]#i", "{}", $o['Description']);
             $o['Description'] = preg_replace("#\[b[\\\]*\s*\]#i", "||", $o['Description']);
-           $o['Description'] = preg_replace('#\[([^\]]*)\]#', '<$1>', $o['Description']);
+            $o['Description'] = preg_replace('#\[([^\]]*)\]#', '<$1>', $o['Description']);
             $o['Description'] = preg_replace("#<span.*#si", "", $o['Description']);
             $o['Description'] = preg_replace("#<[^>]*>#i", '', $o['Description']);
             $o['Description'] = preg_replace("#"."{}"."#i", '<br>', $o['Description']);
@@ -217,10 +208,25 @@ function in_docker_repos($url) {
 }
 
 switch ($_POST['action']) {
+case 'toggle_repo':
+  $url = urldecode(($_POST['url']));
+  $file = is_file($docker_repos) ? file($docker_repos,FILE_IGNORE_NEW_LINES) : array();
+  if ( in_array($url, $file) ){
+    $file = preg_grep("#${url}#i", $file, PREG_GREP_INVERT);
+    $status = "disabled";
+  } else {
+    $file[] = $url;
+    $status="enabled";
+  }
+  file_put_contents($docker_repos, implode(PHP_EOL, $file));
+  $DockerTemplates = new DockerTemplates();
+  $DockerTemplates->downloadTemplates();
+  echo json_encode(array('status'=>$status));
+  break;
 
 case 'get_content':
   $filter = isset($_POST['filter']) ? urldecode(($_POST['filter'])) : false;
-  $category = isset($_POST['category']) ? '/'.urldecode(($_POST['category'])).'/i' : false;
+  $beta = isset($_POST['beta']) ? $_POST['beta']=='true' : false;
   $docker_repos = is_file($docker_repos) ? file($docker_repos,FILE_IGNORE_NEW_LINES) : array();
   if (!file_exists($infoFile)) {
     $Community = new Community();
@@ -232,72 +238,46 @@ case 'get_content':
   $file = json_decode(@file_get_contents($infoFile),true);
   if (!is_array($file)) break;
 
-  $runningDockers=str_replace('/','',shell_exec('docker ps'));
-  $imagesDocker=str_replace('/','',shell_exec('docker images'));
-
   $ct='';
-  $i=0;
   foreach ($file as $repo) {
+    if (!$beta && stripos($repo['name'],' beta')) continue;
+    $img = in_docker_repos($repo['url']) ? "src='/plugins/$plugin/images/red.png' title='Click to remove repository'" : "src='/plugins/$plugin/images/green.png' title='Click to add repository'";
+    $label = $filter ? "<h3>{$repo['name']}</h3>" : "<a href='#' title='Click to show/hide dockers' class='toggle'><h3>{$repo['name']}</h3></a><img $img style='width:48px;height:48px;cursor:pointer' onclick='toggleRepo(this,\"{$repo['url']}\")'>";
     $forum = isset($repo['forum']) ? $repo['forum'] : "";
     $t = "";
+    $i = 0;
     foreach ($repo['templates'] as $template) {
       $name = $template['Name'];
-
-      if ( strcmp($category,"/BETA/i") == 0 ) {
-        if ( (! stripos($repo['name'],' beta'))) {
-                continue;
-        } 
-      } else {
-        if ( $category && ! preg_match($category, $template['Category'])) { continue; }
-     }
       if ($filter) {
          if (preg_match("#$filter#i", $template['Name']) || preg_match("#$filter#i", $template['Author']) || preg_match("#$filter#i", $template['Description'])) {
-            $template['Description'] = highlight($filter, $template['Description']); $tr_td = "<tr>";
-            $template['Author'] = highlight($filter, $template['Author']);
+            $template['Description'] = highlight($filter, $template['Description']); $tr_td = "<tr><td style='text-align:left'>$label</td>";            $template['Author'] = highlight($filter, $template['Author']);
             $template['Name'] = highlight($filter, $name);
 	       } else continue;
       } else {
-        $c = "";
-        $tr_td = "<tr>";
+        $c = $i ? "" : " class='topRow'";
+        $tr_td = $i++ ? "<tr class='expand-child'>" : "<tr><td${c} rowspan='_ROWS_' style='text-align:left;vertical-align:top'>$label (_ROWS_)</td>";
       }
-
-      $dockerRepo="/".str_replace('/','',$template['Repository'])."/i";
-
-      $dockerStatus = "";
-      if ( preg_match($dockerRepo, $imagesDocker) ) {
-        $dockerStatus = preg_match($dockerRepo, $runningDockers) ? "Currently running" : "Currently not running";
-      }
-
-      $dockerName = $template['Name'];
-
-      if ( ( $template['Beta'] == "true" ) || ( ! stripos($repo['name'],' beta') == 0 )) {
-        $dockerName .= "<span title='Beta Container &#13;See support forum for potential issues'><font size='1' color='red'><strong>(beta)</strong></font></span>";
-      }
-
-      $i=++$i;
       $selected = $info[$name]['template'] && stripos($info[$name]['icon'], $template['Author']) !== false;
-
-      $t .= sprintf("$tr_td<td${c} style='text-align:center;margin:0;padding:0'><a href='/Docker/%s' title='%s' target='_blank'><img src='%s' style='width:48px;height:48px;'></a><a href='/Docker/%s' target='_blank' title='Currently installed &#13;Click to edit application'><img src='/plugins/$plugin/images/wrench.png' style='width:30px;visibility:%s'></a></td><td${c}>%s%s</td><td${c}>%s</td><td${c}><span class='desc_readmore' style='display:block' title='Categories: %s'>%s</span></td><td><font size=1px>%s</font></td></tr>",
+      $t .= sprintf("$tr_td<td${c} style='text-align:center;margin:0;padding:0'><a href='/Docker/%s' title='Click to add container (using default values)'><img src='%s' style='width:48px;height:48px;'></a></td><td${c}>%s</td><td${c}>%s%s</td><td${c}>%s</td><td${c}><span class='desc_readmore' style='display:block'>%s</span></td></tr>",
+#           ($selected ? "UpdateContainer?xmlTemplate=edit:".addslashes($info[$name]['template']) : "AddContainer?xmlTemplate=default:".addslashes($template['Path'])),
             "AddContainer?xmlTemplate=default:".addslashes($template['Path']),
-           ($selected ? "Currently Installed &#13;Click to reinstall application using default values" : "Click to install application"),
+#           ($selected ? "edit" : "add"),
            ($template['Icon'] ? $template['Icon'] : "/plugins/$plugin/images/question.png"),
-            "UpdateContainer?xmlTemplate=edit:".addslashes($info[$name]['template']),
-           ($selected ? "" : "hidden"),
-            $dockerName,
-           ($template['Support'] ? "<div><a href='".$template['Support']."' target='_blank' title='Click to go to the support thread'>[Support]</a></div>" : ""),
+           ($selected ? "<a href='/Docker/UpdateContainer?xmlTemplate=edit:".addslashes($info[$name]['template'])."' title='Click to edit container'><i class='fa fa-wrench'></i> " : ""),
+            $template['Name'],
+           ($template['Support'] ? "<div><a href='".$template['Support']."' target='_blank'>[Support]</a></div>" : ""),
             $template['Author'],
-           $template['Category'],
-            $template['Description'],
-            $repo['name']);
+            $template['Description']);
     }
-     $ct .= $t;
+    $ct .= str_replace('_ROWS_',$i,$t);
   }
+  echo $ct ? $ct : "<tr><td colspan='5'><br><center>No matching content found</center></td></tr>";
 
-
-  echo $ct ? $ct : "<tr><td colspan='7'><br><center>No matching content found</center></td></tr>";
-  $updateTime = filemtime('/usr/local/emhttp/state/plugins/community.repositories/templates.json');
-  echo "<script>document.getElementById('Total').innerHTML = $i;";
-  echo "document.getElementById('updateTime').innerHTML = '".date("F d Y H:i    ",$updateTime)."'; </script>";
+  if ( ! file_exists("/usr/local/emhttp/plugins/$plugin/deprecate") ) {
+    echo "<script>alert('Community Repositories is now deprecated, and has been replaced by Community Applications.  NOTE: This plugin will continue to still work, but it is recommended to upgrade to the replacement.  A new tab should open with the download page (check your pop-up blocker).  This prompt will only happen this one time'); window.open('http://lime-technology.com/forum/index.php?topic=40262.0');</script>";
+  }
+  file_put_contents("/usr/local/emhttp/plugins/$plugin/deprecate","deprecated");
+  
   break;
 
 case 'force_update':
