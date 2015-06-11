@@ -128,6 +128,11 @@
     "name": "soana's Repository",
     "url":  "https://github.com/soana/unraid-docker-templates/tree/master/soana",
     "forum": ""
+  },
+  {
+    "name": "macester's Repository",
+	"url":  "https://github.com/macexx/docker-templates",
+	"forum":  "http://lime-technology.com/forum/index.php?topic=40553.0"
   }
 ]
 
