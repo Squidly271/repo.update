@@ -132,7 +132,12 @@
   {
     "name": "macester's Repository",
 	"url":  "https://github.com/macexx/docker-templates",
-	"forum":  "http://lime-technology.com/forum/index.php?topic=40553.0"
+	"forum":  "http://lime-technology.com/forum/index.php?topic=40630.0"
+  },
+  {
+    "name":  "Official Limetech Repository",
+	"url":  "https://github.com/limetech/docker-templates",
+	"forum":  "http://lime-technology.com/forum/index.php?topic=40654.0"
   }
 ]
 
