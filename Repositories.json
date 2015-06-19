@@ -138,11 +138,6 @@
     "name":  "Official Limetech Repository",
 	"url":  "https://github.com/limetech/docker-templates",
 	"forum":  "http://lime-technology.com/forum/index.php?topic=40654.0"
-  },
-  {
-    "name": "IanCole's Forked Repository",
-    "url": "https://github.com/Squidly271/docker-templates/tree/master/digitalman2112",
-    "forum": "http://lime-technology.com/forum/index.php?topic=37556.msg347299#msg347299"
-  },
+  }
 ]
 
