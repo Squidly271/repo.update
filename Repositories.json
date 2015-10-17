@@ -148,6 +148,11 @@
     "name":  "sdesbure's Repository",
 	"url":  "https://github.com/sdesbure/docker-containers",
 	"forum":  "http://lime-technology.com/forum/index.php?topic=41543.0"
+  },
+  {
+    "name": "joch's Repository",
+        "url":  "https://github.com/joch/unraid-docker-templates",
+        "forum":  ""
   }
 ]
 
