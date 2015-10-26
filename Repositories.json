@@ -158,6 +158,11 @@
 	  "name": "snoopy86's Repository",
 	  "url":  "https://github.com/snoopy86/docker-repo/tree/master/snoopy",
 	  "forum":  "http://lime-technology.com/forum/index.php?topic=43610.0"
+  },
+  {
+          "name": "rix1337's Repository",
+          "url":  "https://github.com/rix1337/docker-templates",
+          "forum": ""
   }
 ]
 
