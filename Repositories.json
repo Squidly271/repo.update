@@ -168,6 +168,11 @@
 	      "name": "linuxserver.io-Dev Repository",
 		  "url":  "https://github.com/linuxserver/beta-templates",
 		  "forum":  "http://lime-technology.com/forum/index.php?topic=42092.0"
+  },
+  {
+          "name": "tinglis1's Repository",
+          "url":  "https://github.com/tinglis1/docker-containers/tree/master",
+          "forum": ""
   }
 ]
 
