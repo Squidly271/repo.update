@@ -173,6 +173,14 @@
           "name": "tinglis1's Repository",
           "url":  "https://github.com/tinglis1/docker-containers/tree/master/pipework",
           "forum": "http://lime-technology.com/forum/index.php?topic=43970.0"
+  },
+  {
+    "name": "dlandon's plugin Repository",
+    "url":  "https://github.com/dlandon/apps.plugins/"
+  },
+  {
+    "name": "macester's plugin Repository",
+    "url":  "https://github.com/macexx/plugin-templates"
   }
 ]
 
