@@ -181,6 +181,10 @@
   {
     "name": "macester's plugin Repository",
     "url":  "https://github.com/macexx/plugin-templates"
+  },
+  {
+    "name": "Squid's plugin Repository",
+    "url":  "https://github.com/Squidly271/plugin-repository"
   }
 ]
 
