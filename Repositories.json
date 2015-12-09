@@ -192,7 +192,7 @@
   },
   {
     "name": "peter_sm's plugin Repository",
-    "url":  "https://github.com/Squidly271/petersm_plugin_repository/",
+    "url":  "https://github.com/petersm1/OpenVPN_plugin_repository",
     "forum":  "http://lime-technology.com/forum/index.php?topic=35435.0"
   },
   {
@@ -207,6 +207,14 @@
   {
     "name": "unofficial Limetech plugin Repository",
     "url": "https://github.com/Squidly271/limetech-plugin-repository/"
+  },
+  {
+    "name": "bb12489's Repository",
+    "url":  "https://github.com/bb12489/docker-templates/tree/master/bb12489"
+  },
+  {
+    "name": "coppit's plugin Repository",
+    "url":  "https://github.com/Squidly271/coppit-s-plugin-repository/"
   }
 ]
 
