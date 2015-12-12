@@ -223,6 +223,10 @@
   {
     "name": "theone's plugin Repository",
     "url":  "https://github.com/Squidly271/theone-plugin-repository/"
+  },
+  {
+    "name":  "Zeron's plugin Repository",
+    "url":  "https://github.com/Squidly271/zeron-plugin-repository"
   }
 ]
 
