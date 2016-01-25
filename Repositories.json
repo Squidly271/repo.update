@@ -253,6 +253,10 @@
     "name": "Emby Repository",
     "url":  "https://github.com/MediaBrowser/Emby.Build/tree/master/unraid-templates/emby",
     "forum": "https://lime-technology.com/forum/index.php?topic=45444.0"
+  },
+  {
+    "name": "dibbz' Repository",
+    "url":  "https://github.com/quimnut/unraid-docker-templates"
   }
 ]
 
