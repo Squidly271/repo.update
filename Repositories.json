@@ -255,6 +255,11 @@
   {
     "name": "dibbz' Repository",
     "url":  "https://github.com/quimnut/unraid-docker-templates",
+    "forum": "",
+  },
+  {
+    "name": "johnodon's Repository",
+    "url":  "https://github.com/johnodon/unraid-templates/tree/master/zap2xml",
     "forum": ""
   }
 ]
